@@ -1,4 +1,4 @@
-name: R2C-OpenWrt
+name: BPI-R4-OpenWrt
 
 on:
 #  schedule:
@@ -46,8 +46,8 @@ jobs:
         df -h
     - name: Prepare Mixedwrt
       run: |
-        sudo chown -R runner:runner /home/runner/work/YAOF
-        cp -r ./SCRIPTS/R2S/. ./SCRIPTS/
+        sudo chown -R runner:runner /home/runner/work/YAOF-bpi-r4
+        cp -r ./SCRIPTS/BPI-R4/. ./SCRIPTS/
         cp -r ./SCRIPTS/. ./
         /bin/bash 01_get_ready.sh
     - name: Prepare Package
@@ -60,7 +60,7 @@ jobs:
     - name: QTMDFW4
       working-directory: ${{ github.workspace }}/openwrt
       run: |
-        cp -rf ../SEED/R2C/config.seed .config
+        cp -rf ../SEED/BPI-R4/config.seed .config
     - name: Convert Translation
       working-directory: ${{ github.workspace }}/openwrt
       run: |
@@ -82,7 +82,7 @@ jobs:
       working-directory: ${{ github.workspace }}/openwrt
       run: |
         TARGET_DEVICE_ARCH="$(grep "^CONFIG_TARGET_.*_.*=y$" ".config" | head -n 1 | sed 's/^CONFIG_TARGET_//g' | awk -F '_' '{print $1}')"
-        echo "TARGET_DEVICE_ARCH=${TARGET_DEVICE_ARCH}-3328" >>$GITHUB_ENV
+        echo "TARGET_DEVICE_ARCH=${TARGET_DEVICE_ARCH}-mt7988" >>$GITHUB_ENV
         latest_release="$(curl -s https://github.com/openwrt/openwrt/tags | grep -Eo "v[0-9\.]+\-*r*c*[0-9]*.tar.gz" | sed -n '/[2-9][4-9]/p' | sed -n 1p | sed 's/.tar.gz//g' | sed 's/v//g')"
         echo "latest_release=${latest_release}" >>$GITHUB_ENV
     - name: Cache
@@ -115,15 +115,14 @@ jobs:
       run: |
         rm -rf ./artifact/
         mkdir -p ./artifact/
-        mv openwrt/bin/targets/rockchip/armv8/*sysupgrade.img* ./artifact/
+        mv openwrt/bin/targets/mediatek/filogic/openwrt*bpi-r4* ./artifact/
         cd ./artifact/
         ls -Ahl
-        gzip -d *.gz && exit 0
+        gzip -d *.gz
         gzip --best *.img
         ls -Ahl
-        sha256sum openwrt*r2c* | tee R2C-GC404-$(date +%Y-%m-%d)-${{ env.latest_release }}.sha256sum
-        zip R2C-GC404-$(date +%Y-%m-%d)-${{ env.latest_release }}-ext4.zip *r2c*ext4*
-        zip R2C-GC404-$(date +%Y-%m-%d)-${{ env.latest_release }}-sfs.zip *r2c*squashfs*
+        sha256sum openwrt*bpi-r4* | tee BPI-R4-$(date +%Y-%m-%d)-${{ env.latest_release }}.sha256sum
+        zip BPI-R4-$(date +%Y-%m-%d)-${{ env.latest_release }}-bundle.zip openwrt*bpi-r4*
         ls -Ahl
     - name: Create release
       id: create_release
@@ -133,7 +132,7 @@ jobs:
         allowUpdates: true
         prerelease: false
         tag: ${{ env.latest_release }}
-        commit: "24.10"
+        commit: "mt7988-24.10"
         replacesArtifacts: true
         token: ${{ secrets.GITHUB_TOKEN }}
         artifacts: ./artifact/*.zip

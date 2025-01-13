@@ -64,6 +64,8 @@ CONFIG_LRNG_SELFTEST=y
 cp -rf ../PATCH/kernel/wg/* ./target/linux/generic/hack-6.6/
 # dont wrongly interpret first-time data
 echo "net.netfilter.nf_conntrack_tcp_max_retrans=5" >>./package/kernel/linux/files/sysctl-nf-conntrack.conf
+# OTHERS
+cp -rf ../PATCH/kernel/others/* ./target/linux/generic/pending-6.6/
 
 ### Fullcone-NAT 部分 ###
 # bcmfullcone
@@ -138,6 +140,8 @@ sed -i 's,rootwait,rootwait mitigations=off,g' target/linux/rockchip/image/defau
 sed -i 's,@CMDLINE@ noinitrd,noinitrd mitigations=off,g' target/linux/x86/image/grub-efi.cfg
 sed -i 's,@CMDLINE@ noinitrd,noinitrd mitigations=off,g' target/linux/x86/image/grub-iso.cfg
 sed -i 's,@CMDLINE@ noinitrd,noinitrd mitigations=off,g' target/linux/x86/image/grub-pc.cfg
+# nanopi
+sed -i 's,CONFIG_PREEMPT=y,CONFIG_PREEMPT_NONE_BUILD=y,g' target/linux/rockchip/armv8/config-6.6
 
 ### ADD PKG 部分 ###
 cp -rf ../OpenWrt-Add ./package/new
@@ -224,13 +228,4 @@ cp -rf ../OpenWrt-Add/fuck ./package/base-files/files/usr/bin/fuck
 rm -rf .config
 sed -i 's,CONFIG_WERROR=y,# CONFIG_WERROR is not set,g' target/linux/generic/config-6.6
 
-#LTO/GC
-# Grub 2
-sed -i 's,no-lto,no-lto no-gc-sections,g' package/boot/grub2/Makefile
-# openssl disable LTO
-sed -i 's,no-mips16 gc-sections,no-mips16 gc-sections no-lto,g' package/libs/openssl/Makefile
-# nginx
-sed -i 's,gc-sections,gc-sections no-lto,g' feeds/packages/net/nginx/Makefile
-# libsodium
-sed -i 's,no-mips16,no-mips16 no-lto,g' feeds/packages/libs/libsodium/Makefile
 #exit 0

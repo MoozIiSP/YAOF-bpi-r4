@@ -1,4 +1,4 @@
-name: X86-OpenWrt
+name: R2S-OpenWrt
 
 on:
 #  schedule:
@@ -28,7 +28,7 @@ jobs:
     uses: ./.github/workflows/OpenWrt-Matrix.yml
     if: github.event.repository.owner.id == github.event.sender.id && inputs.badge_status == ''
     with:
-      targets: "X86"
+      targets: "R2S"
       upload_source: ${{ github.event_name == 'workflow_dispatch' && inputs.upload_source }}
       build_firmware: ${{ (github.event_name == 'workflow_dispatch' && inputs.build_firmware) || github.event_name != 'workflow_dispatch' }}
 

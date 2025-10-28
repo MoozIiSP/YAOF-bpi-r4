@@ -38,6 +38,10 @@
 
 - 选择自己<b>设备对应的固件</b>，并[下载](https://github.com/QiuSimons/R2S-R4S-OpenWrt/releases)
 
+### 致敬
+
+本仓库衍生于 [QiuSimons/YAOF](https://github.com/QiuSimons/YAOF)，感谢原作者的付出。
+
 ### 鸣谢
 
 |               [ImmortalWrt](https://github.com/immortalwrt)               |              [coolsnowwolf](https://github.com/coolsnowwolf)              |                    [Lienol](https://github.com/Lienol)                    |

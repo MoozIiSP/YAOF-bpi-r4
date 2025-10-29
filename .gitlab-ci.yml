@@ -102,21 +102,6 @@ build:
       # - TARGET: "BPI-R4-PRO"
       #   SCRIPT_DIR: "BPI-R4-PRO"
       #   ARCH: "mediatek/filogic"
-      - TARGET: "R2C"
-        SCRIPT_DIR: "R2S"
-        ARCH: "rockchip/armv8"
-      - TARGET: "R2S"
-        SCRIPT_DIR: "R2S"
-        ARCH: "rockchip/armv8"
-      - TARGET: "R3S"
-        SCRIPT_DIR: "R4S"
-        ARCH: "rockchip/armv8"
-      - TARGET: "R4S"
-        SCRIPT_DIR: "R4S"
-        ARCH: "rockchip/armv8"
-      - TARGET: "X86"
-        SCRIPT_DIR: "X86"
-        ARCH: "x86/64"
   <<: *build_definition
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

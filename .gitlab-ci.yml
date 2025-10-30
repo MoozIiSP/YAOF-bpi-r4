@@ -8,6 +8,8 @@ stages:
 .build_template: &build_definition
   stage: build
   image: ubuntu:24.04
+  tags:
+    - linux
   before_script:
     - echo "Installing build dependencies..."
     - export DEBIAN_FRONTEND=noninteractive
@@ -110,6 +112,8 @@ build:
 release:
   stage: release
   image: alpine:latest
+  tags:
+    - linux
   before_script:
     - apk add --no-cache curl unzip
     - \'curl -sL "https://gitlab.com/gitlab-org/release-cli/-/releases/latest/downloads/bin/release-cli-linux-amd64" -o /usr/local/bin/release-cli\'

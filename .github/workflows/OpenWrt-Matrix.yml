@@ -46,11 +46,7 @@ jobs:
           # All possible targets
           all_targets='[
             {"name": "BPI-R4", "script_dir": "BPI-R4", "arch": "mediatek/filogic", "arch_suffix": "mt7988"},
-            {"name": "R2C", "script_dir": "R2S", "arch": "rockchip/armv8", "arch_suffix": "3328"},
-            {"name": "R2S", "script_dir": "R2S", "arch": "rockchip/armv8", "arch_suffix": "3328"},
-            {"name": "R3S", "script_dir": "R4S", "arch": "rockchip/armv8", "arch_suffix": "3566"},
-            {"name": "R4S", "script_dir": "R4S", "arch": "rockchip/armv8", "arch_suffix": "3399"},
-            {"name": "X86", "script_dir": "X86", "arch": "x86/64", "arch_suffix": ""}
+            {"name": "BPI-R4-PRO", "script_dir": "BPI-R4-PRO", "arch": "mediatek/filogic", "arch_suffix": "mt7988"}
           ]'
 
           # User selected targets

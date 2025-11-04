@@ -2,6 +2,36 @@
 clear
 
 ### 基础部分 ###
+# 可选：接入 MediaTek 的 OpenWrt feeds 或本地 SDK
+# 通过环境变量控制，不默认启用，以免影响现有构建：
+# - USE_MTK_FEED=1                 启用在线 mtk feeds
+#   MTK_FEED_URL=...               feeds 仓库地址（可选，留空用默认）
+#   MTK_FEED_BRANCH=...            分支（可选，默认尝试与底座版本匹配）
+# - MTK_SDK_TARBALL=/path/to.tgz   使用离线 SDK 包（可选）
+if [ "${USE_MTK_FEED:-0}" = "1" ]; then
+  echo "[MTK] 启用 MediaTek feeds 集成"
+  MTK_FEED_URL=${MTK_FEED_URL:-https://git01.mediatek.com/openwrt/mtk-openwrt-feeds.git}
+  # 优先尝试与 openwrt-24.10 对齐；如需其他版本，请在 CI 变量中覆盖
+  MTK_FEED_BRANCH=${MTK_FEED_BRANCH:-openwrt-24.10}
+  if ! grep -qE "^src-git mtk " feeds.conf.default; then
+    echo "src-git mtk ${MTK_FEED_URL};${MTK_FEED_BRANCH}" >> feeds.conf.default
+  fi
+fi
+
+if [ -n "${MTK_SDK_TARBALL:-}" ]; then
+  echo "[MTK] 使用本地 SDK 包：${MTK_SDK_TARBALL}"
+  mkdir -p ../mtk-sdk
+  tar -xf "${MTK_SDK_TARBALL}" -C ../mtk-sdk || {
+    echo "[MTK] 解压 SDK 失败" >&2; exit 2;
+  }
+  # 如果离线 SDK 中提供了 feeds 目录，作为本地 feed 接入
+  if [ -d ../mtk-sdk/feeds ]; then
+    if ! grep -qE "^src-link mtk-sdk " feeds.conf.default; then
+      echo "src-link mtk-sdk ../mtk-sdk/feeds" >> feeds.conf.default
+    fi
+  fi
+fi
+
 # 使用 O2 级别的优化
 sed -i 's/Os/O2/g' include/target.mk
 # 更新 Feeds

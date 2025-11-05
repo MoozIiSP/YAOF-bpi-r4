@@ -85,12 +85,12 @@ stages:
       section_end configure
 
       section_start compile "Compile firmware"
-      make defconfig
-      make download -j${BUILD_CORES}
-      make -j${BUILD_CORES} package/network/utils/nftables/refresh V=s
+      make -s defconfig
+      make -s -j${BUILD_CORES} download
+      make -s -j${BUILD_CORES} package/network/utils/nftables/refresh V=s
       export BUILD_CORES_PLUS_ONE=$((BUILD_CORES + 1))
       retry=0
-      until IGNORE_ERRORS=1 make -j${BUILD_CORES_PLUS_ONE}; do
+      until IGNORE_ERRORS=1 make -s -j${BUILD_CORES_PLUS_ONE}; do
         if (( retry >= 1 )); then
           echo "Make failed after retry; falling back to single-threaded verbose build."
           cat ./.config
@@ -98,7 +98,7 @@ stages:
           break
         fi
         echo "Make failed, retrying after refreshing downloads (possible network issue)..."
-        make download -j1 || true
+        make -s -j1 download || true
         retry=$((retry + 1))
       done
       section_end compile

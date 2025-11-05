@@ -8,7 +8,10 @@ stages:
 
 .build_template: &build_definition
   stage: build
-  image: ubuntu:24.04
+  image:
+    name: ubuntu:24.04
+  variables:
+    FORCE_UNSAFE_CONFIGURE: "1"
   tags:
     - linux
   before_script:
@@ -225,7 +228,8 @@ package:
 
 release:
   stage: release
-  image: alpine:latest
+  image:
+    name: alpine:latest
   tags:
     - linux
   before_script:

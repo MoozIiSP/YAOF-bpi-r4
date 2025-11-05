@@ -90,9 +90,10 @@ stages:
       make -s -j${BUILD_CORES} package/network/utils/nftables/refresh V=s
       export BUILD_CORES_PLUS_ONE=$((BUILD_CORES + 1))
       retry=0
+      MAX_RETRY=10
       until IGNORE_ERRORS=1 make -s -j${BUILD_CORES_PLUS_ONE}; do
-        if (( retry >= 1 )); then
-          echo "Make failed after retry; falling back to single-threaded verbose build."
+        if (( retry >= MAX_RETRY )); then
+          echo "Make failed after ${MAX_RETRY} retries; falling back to single-threaded verbose build."
           cat ./.config
           make -j1 V=s
           break

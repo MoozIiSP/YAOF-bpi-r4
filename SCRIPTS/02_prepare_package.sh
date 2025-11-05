@@ -1,6 +1,41 @@
 #!/bin/bash
 clear
 
+### feeds 优化 ###
+# 先尝试 GitHub 镜像，失败后回退到 git.openwrt.org
+rewrite_feeds() {
+  local pkg_src=$1
+  local luci_src=$2
+  local routing_src=$3
+  local telephony_src=$4
+  for feed_file in feeds.conf feeds.conf.default; do
+    if [ -f "$feed_file" ]; then
+      sed -i "s#https://git.openwrt.org/feed/packages.git[^ ]*#$pkg_src#g" "$feed_file"
+      sed -i "s#https://git.openwrt.org/project/luci.git[^ ]*#$luci_src#g" "$feed_file"
+      sed -i "s#https://git.openwrt.org/feed/routing.git[^ ]*#$routing_src#g" "$feed_file"
+      sed -i "s#https://git.openwrt.org/feed/telephony.git[^ ]*#$telephony_src#g" "$feed_file"
+    fi
+  done
+}
+
+rewrite_feeds "https://github.com/openwrt/packages.git;openwrt-24.10" \
+              "https://github.com/openwrt/luci.git;openwrt-24.10" \
+              "https://github.com/openwrt/routing.git;openwrt-24.10" \
+              "https://github.com/openwrt/telephony.git;openwrt-24.10"
+
+if ! ./scripts/feeds update -a; then
+  echo "GitHub 镜像更新失败，尝试切换回官方源..."
+  rewrite_feeds "https://git.openwrt.org/feed/packages.git;openwrt-24.10" \
+                "https://git.openwrt.org/project/luci.git;openwrt-24.10" \
+                "https://git.openwrt.org/feed/routing.git;openwrt-24.10" \
+                "https://git.openwrt.org/feed/telephony.git;openwrt-24.10"
+  ./scripts/feeds update -a
+fi
+
+if ! ./scripts/feeds install -a; then
+  echo "Feeds 安装部分失败，请检查上游仓库状态。" >&2
+fi
+
 ### 基础部分 ###
 # 可选：接入 MediaTek 的 OpenWrt feeds 或本地 SDK
 # 通过环境变量控制，不默认启用，以免影响现有构建：
@@ -34,9 +69,6 @@ fi
 
 # 使用 O2 级别的优化
 sed -i 's/Os/O2/g' include/target.mk
-# 更新 Feeds
-./scripts/feeds update -a
-./scripts/feeds install -a
 # 移除 SNAPSHOT 标签
 sed -i 's,-SNAPSHOT,,g' include/version.mk
 sed -i 's,-SNAPSHOT,,g' package/base-files/image-config.in

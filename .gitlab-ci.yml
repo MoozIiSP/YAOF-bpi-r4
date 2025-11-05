@@ -14,7 +14,7 @@ stages:
     - echo "Installing build dependencies..."
     - export DEBIAN_FRONTEND=noninteractive
     - apt-get -qq update
-    - apt-get -y -qq --no-install-recommends install apt-transport-https curl ca-certificates
+    - apt-get -y -qq --no-install-recommends install software-properties-common apt-transport-https curl ca-certificates
     - add-apt-repository -y ppa:apt-fast/stable
     - apt-get -y -qq update
     - apt-get -y -qq --no-install-recommends install apt-fast
@@ -28,7 +28,14 @@ stages:
     - git config --global core.abbrev auto
     - df -h
   script:
-    - echo "Starting build for $TARGET"
+    - mkdir -p ci-logs
+    - LOG_FILE="$PWD/ci-logs/build.log"
+    - echo "Starting build for $TARGET (logging to $LOG_FILE)"
+    - echo "GitLab logs over 4MiB are truncated; retrieve ci-logs/build.log artifact if you see 'Job's log exceeded limit of 4194304 bytes.'"
+    - exec > >(tee -a "$LOG_FILE") 2>&1
+    - set -o pipefail
+    - export BUILD_CORES=$(nproc)
+    - export MAKEFLAGS="-j${BUILD_CORES}"
     # Maximize build space
     - rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
     # Prepare Mixedwrt
@@ -50,9 +57,10 @@ stages:
     - /bin/bash 08_fix_permissions.sh
     # Build
     - make defconfig
-    - make download -j$(nproc)
-    - make -j$(nproc) package/network/utils/nftables/refresh V=s
-    - IGNORE_ERRORS=1 make -j$(($(nproc) + 1)) || (cat ./.config && make -j1 V=s)
+    - make download -j${BUILD_CORES}
+    - make -j${BUILD_CORES} package/network/utils/nftables/refresh V=s
+    - export BUILD_CORES_PLUS_ONE=$((BUILD_CORES + 1))
+    - IGNORE_ERRORS=1 make -j${BUILD_CORES_PLUS_ONE} || (cat ./.config && make -j1 V=s)
     # Organize artifacts
     - |
       export LATEST_RELEASE=$(curl -s https://github.com/openwrt/openwrt/tags | grep -Eo "v[0-9\\.]+\\-*r*c*[0-9]*.tar.gz" | sed -n \'/[2-9][4-9]/p\' | sed -n 1p | sed \'s/.tar.gz//g\' | sed \'s/v//g\')
@@ -84,6 +92,7 @@ stages:
     name: "artifacts-${TARGET}"
     paths:
       - artifact/
+      - ci-logs/build.log
     expire_in: 1 week
   cache:
     key: "cache-${TARGET}"

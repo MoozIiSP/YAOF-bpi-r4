@@ -8,6 +8,7 @@ stages:
 
 .build_template: &build_definition
   stage: build
+  allow_failure: true
   image:
     name: ubuntu:24.04
   variables:
@@ -111,12 +112,16 @@ stages:
       - openwrt/bin/
       - ci-logs/build.log
     expire_in: 1 week
+    when: always
   cache:
-    key: "cache-${TARGET}"
-    paths:
-      - openwrt/staging_dir
-      - openwrt/build_dir
-      - openwrt/dl
+    - key: "cache-${TARGET}"
+      paths:
+        - openwrt/staging_dir
+        - openwrt/build_dir
+    - key: "openwrt-dl-${TARGET}"
+      paths:
+        - openwrt/dl
+      policy: pull-push
 
 .matrix_targets: &matrix_targets
   - TARGET: "BPI-R4"
@@ -223,6 +228,7 @@ package:
       - artifact/
       - ci-logs/package.log
     expire_in: 1 week
+    when: always
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: $CI_PIPELINE_SOURCE == "web"

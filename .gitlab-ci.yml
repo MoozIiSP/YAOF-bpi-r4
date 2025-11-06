@@ -114,15 +114,6 @@ stages:
       - ci-logs/build.log
     expire_in: 1 week
     when: always
-  cache:
-    - key: "cache-${TARGET}"
-      paths:
-        - openwrt/staging_dir
-        - openwrt/build_dir
-    - key: "openwrt-dl-${TARGET}"
-      paths:
-        - openwrt/dl
-      policy: pull-push
 
 .matrix_targets: &matrix_targets
   - TARGET: "BPI-R4"

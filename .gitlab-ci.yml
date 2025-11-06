@@ -183,11 +183,11 @@ test-tools:
       section_end configure
 
       section_start compile_tools "Compile requested tools"
-      make -s defconfig
-      make -s tools/cmake/download
-      make -s tools/dwarves/download
-      make -s -j${BUILD_CORES} tools/cmake/compile V=s
-      make -s -j${BUILD_CORES} tools/dwarves/compile V=s
+      make V=s defconfig
+      make V=s tools/cmake/download
+      make V=s tools/dwarves/download
+      make -j${BUILD_CORES} V=s tools/cmake/compile
+      make -j${BUILD_CORES} V=s tools/dwarves/compile
       section_end compile_tools
 
       section_start dummy_artifacts "Create dummy build outputs"

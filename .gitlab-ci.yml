@@ -2,6 +2,7 @@
 # This is a conversion from the existing GitHub Actions workflow.
 
 stages:
+  - test
   - build
   - package
   - release
@@ -132,6 +133,94 @@ stages:
   #   ARCH: "mediatek/filogic"
 
 #
+# Test Stage Job
+#
+test-tools:
+  parallel:
+    matrix: *matrix_targets
+  <<: *build_definition
+  stage: test
+  script:
+    - |
+      runuser -u runner -- env TARGET="$TARGET" SCRIPT_DIR="$SCRIPT_DIR" ARCH="$ARCH" bash <<'EOS'
+      set -euo pipefail
+
+      export PATH="/home/runner/.local/bin:$PATH"
+
+      section_start() {
+        echo -e "section_start:$(date +%s):$1[collapsed=true]\r$2"
+      }
+
+      section_end() {
+        echo -e "section_end:$(date +%s):$1\r"
+      }
+
+      mkdir -p ci-logs
+      LOG_FILE="$PWD/ci-logs/test-tools.log"
+      echo "Starting tool build for $TARGET (logging to $LOG_FILE)"
+      echo "GitLab logs over 4MiB are truncated; retrieve ci-logs/test-tools.log artifact if you see 'Job's log exceeded limit of 4194304 bytes.'"
+
+      exec > >(tee -a "$LOG_FILE") 2>&1
+
+      export BUILD_CORES=$(nproc)
+      export MAKEFLAGS="-j${BUILD_CORES}"
+
+      section_start free_space "Maximize build space"
+      rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+      section_end free_space
+
+      section_start mixedwrt "Prepare MixedWrt scripts"
+      cp -r "./SCRIPTS/${SCRIPT_DIR}/." ./SCRIPTS/
+      cp -r ./SCRIPTS/. ./
+      /bin/bash 01_get_ready.sh
+      section_end mixedwrt
+
+      section_start packages "Prepare packages"
+      cd openwrt
+      cp -r ../SCRIPTS/. ./
+      /bin/bash 02_prepare_package.sh
+      /bin/bash 02_target_only.sh
+      /bin/bash 04_remove_upx.sh
+      section_end packages
+
+      section_start configure "Configure build"
+      cp -rf ../SEED/${TARGET}/config.seed .config
+      /bin/bash 03_convert_translation.sh
+      /bin/bash 05_create_acl_for_luci.sh -a
+      chmod -R 755 ./08_fix_permissions.sh
+      /bin/bash 08_fix_permissions.sh
+      section_end configure
+
+      section_start compile_tools "Compile requested tools"
+      make -s defconfig
+      make -s tools/cmake/download
+      make -s tools/dwarves/download
+      make -s -j${BUILD_CORES} tools/cmake/compile V=s
+      make -s -j${BUILD_CORES} tools/dwarves/compile V=s
+      section_end compile_tools
+
+      section_start dummy_artifacts "Create dummy build outputs"
+      TARGET_LOWER=$(echo "$TARGET" | tr "A-Z" "a-z")
+      BIN_DIR="bin/targets/${ARCH}"
+      mkdir -p "${BIN_DIR}"
+      printf 'dummy ext4 image for %s\n' "$TARGET" > "${BIN_DIR}/openwrt-${TARGET_LOWER}-ext4.img"
+      printf 'dummy squashfs image for %s\n' "$TARGET" > "${BIN_DIR}/openwrt-${TARGET_LOWER}-squashfs.img"
+      printf 'dummy sysupgrade image for %s\n' "$TARGET" > "${BIN_DIR}/openwrt-${TARGET_LOWER}-sysupgrade.img"
+      mkdir -p bin/packages
+      section_end dummy_artifacts
+      EOS
+  artifacts:
+    name: "test-artifacts-${TARGET}"
+    paths:
+      - openwrt/bin/
+      - ci-logs/test-tools.log
+    expire_in: 1 week
+    when: always
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == "web"
+
+#
 # Matrix Build Job
 #
 build:
@@ -139,8 +228,7 @@ build:
     matrix: *matrix_targets
   <<: *build_definition
   rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-    - if: $CI_PIPELINE_SOURCE == "web"
+    - when: never
 
 package:
   stage: package
@@ -150,8 +238,11 @@ package:
   parallel:
     matrix: *matrix_targets
   needs:
+    - job: test-tools
+      artifacts: true
     - job: build
       artifacts: true
+      optional: true
   before_script:
     - export DEBIAN_FRONTEND=noninteractive
     - apt-get -qq update

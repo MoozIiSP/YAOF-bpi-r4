@@ -1,279 +1,279 @@
-     1|### INITIALIZATION ###
-     2|CONFIG_TARGET_mediatek=y
-     3|CONFIG_TARGET_mediatek_filogic=y
-     4|CONFIG_TARGET_mediatek_filogic_DEVICE_bananapi_bpi-r4=y
-     5|CONFIG_TARGET_KERNEL_PARTSIZE=32
-     6|CONFIG_TARGET_ROOTFS_INITRAMFS=n
-     7|CONFIG_TARGET_ROOTFS_PARTSIZE=4096
-     8|CONFIG_ALL_KMODS=y
-     9|CONFIG_DEVEL=y
-    10|# CONFIG_KERNEL_KALLSYMS is not set
-    11|# CONFIG_KERNEL_WERROR is not set
-    12|CONFIG_KERNEL_BUILD_DOMAIN="buildhost"
-    13|CONFIG_KERNEL_BUILD_USER="builder"
-    14|#CONFIG_PACKAGE_r8152-firmware=y
-    15|CONFIG_COLLECT_KERNEL_DEBUG=y
-    16|CONFIG_REPRODUCIBLE_DEBUG_INFO=y
-    17|
-    18|# GCC
-    19|CONFIG_TOOLCHAINOPTS=y
-    20|
-    21|### ZLIB
-    22|CONFIG_ZLIB_OPTIMIZE_SPEED=y
-    23|
-    24|# DAE
-    25|CONFIG_KERNEL_DEBUG_INFO=y
-    26|CONFIG_KERNEL_DEBUG_INFO_REDUCED=n
-    27|CONFIG_KERNEL_DEBUG_INFO_BTF=y
-    28|CONFIG_KERNEL_CGROUPS=y
-    29|CONFIG_KERNEL_CGROUP_BPF=y
-    30|CONFIG_KERNEL_BPF_EVENTS=y
-    31|CONFIG_BPF_TOOLCHAIN_HOST=y
-    32|CONFIG_KERNEL_XDP_SOCKETS=y
-    33|CONFIG_PACKAGE_kmod-xdp-sockets-diag=y
-    34|CONFIG_PACKAGE_luci-app-dae=y
-    35|
-    36|# SAVING RAM FOR DAE
-    37|CONFIG_PACKAGE_zram-swap=y
-    38|CONFIG_PACKAGE_kmod-lib-lz4=y
-    39|CONFIG_PACKAGE_kmod-lib-lzo=y
-    40|CONFIG_PACKAGE_kmod-lib-zstd=y
-    41|
-    42|### AGGRESSIVE ###
-    43|CONFIG_USE_GC_SECTIONS=y
-    44|CONFIG_USE_LTO=y
-    45|
-    46|# RNGD
-    47|CONFIG_PACKAGE_urandom-seed=y
-    48|CONFIG_PACKAGE_urngd=y
-    49|
-    50|### BASIC ###
-    51|CONFIG_PACKAGE_kmod-hwmon-pwmfan=y
-    52|CONFIG_PACKAGE_addition-trans-zh=y
-    53|CONFIG_PACKAGE_autocore-arm=y
-    54|CONFIG_PACKAGE_ethtool-full=y
-    55|CONFIG_PACKAGE_dnsmasq-full=y
-    56|CONFIG_PACKAGE_dnsmasq_full_ipset=y
-    57|# CONFIG_PACKAGE_dnsmasq_full_broken_rtc is not set
-    58|# CONFIG_PACKAGE_dnsmasq is not set
-    59|CONFIG_PACKAGE_kmod-fs-f2fs=y
-    60|CONFIG_PACKAGE_libustream-openssl=y
-    61|# CONFIG_PACKAGE_libustream-wolfssl is not set
-    62|CONFIG_PACKAGE_wget-ssl=y
-    63|
-    64|### DDNS ###
-    65|CONFIG_PACKAGE_luci-app-ddns=y
-    66|CONFIG_PACKAGE_ddns-scripts=y
-    67|CONFIG_PACKAGE_ddns-scripts-cloudflare=y
-    68|CONFIG_PACKAGE_ddns-scripts-dnspod=y
-    69|CONFIG_PACKAGE_ddns-scripts-services=y
-    70|CONFIG_PACKAGE_ddns-scripts-aliyun=y
-    71|CONFIG_PACKAGE_bind-host=y
-    72|
-    73|### 22.03 ###
-    74|# CONFIG_PACKAGE_firewall is not set
-    75|CONFIG_PACKAGE_firewall4=y
-    76|CONFIG_PACKAGE_kmod-nft-offload=y
-    77|CONFIG_PACKAGE_kmod-nft-fullcone=y
-    78|# CONFIG_PACKAGE_arptables-legacy is not set
-    79|CONFIG_PACKAGE_arptables-nft=y
-    80|# CONFIG_PACKAGE_ebtables-legacy is not set
-    81|#CONFIG_PACKAGE_ebtables-nft=y
-    82|# CONFIG_PACKAGE_ip6tables-legacy is not set
-    83|CONFIG_PACKAGE_ip6tables-nft=y
-    84|# CONFIG_PACKAGE_xtables-legacy is not set
-    85|CONFIG_PACKAGE_xtables-nft=y
-    86|# CONFIG_PACKAGE_iptables-legacy is not set
-    87|CONFIG_PACKAGE_iptables-nft=y
-    88|CONFIG_PACKAGE_iptables-mod-conntrack-extra=y
-    89|CONFIG_PACKAGE_iptables-mod-iprange=y
-    90|CONFIG_PACKAGE_iptables-mod-nat-extra=y
-    91|CONFIG_PACKAGE_iptables-mod-socket=y
-    92|CONFIG_PACKAGE_iptables-mod-tproxy=y
-    93|# CONFIG_PACKAGE_miniupnpd-iptables is not set
-    94|CONFIG_PACKAGE_miniupnpd-nftables=y
-    95|CONFIG_PACKAGE_nat6=y
-    96|
-    97|### LUCI ###
-    98|CONFIG_LUCI_LANG_zh_Hans=y
-    99|CONFIG_LUCI_LANG_en=y
-   100|# CONFIG_LUCI_CSSTIDY is not set
-   101|# CONFIG_LUCI_JSMIN is not set
-   102|CONFIG_PACKAGE_luci-nginx=y
-   103|CONFIG_PACKAGE_luci-compat=y
-   104|
-   105|### APPLICATION ###
-   106|CONFIG_PACKAGE_luci-app-homeproxy=y
-   107|CONFIG_PACKAGE_luci-app-ap-modem=y
-   108|CONFIG_PACKAGE_luci-app-oled=y
-   109|CONFIG_PACKAGE_luci-proto-wireguard=y
-   110|CONFIG_PACKAGE_qrencode=y
-   111|CONFIG_PACKAGE_luci-app-3cat=y
-   112|CONFIG_PACKAGE_luci-app-argon-config=y
-   113|CONFIG_PACKAGE_luci-app-arpbind=y
-   114|CONFIG_PACKAGE_luci-app-taskplan=y
-   115|CONFIG_PACKAGE_luci-app-partexp=y
-   116|CONFIG_PACKAGE_luci-app-airconnect=y
-   117|CONFIG_PACKAGE_luci-app-mosdns=y
-   118|CONFIG_PACKAGE_luci-app-cpufreq=y
-   119|CONFIG_PACKAGE_luci-app-cpulimit=y
-   120|CONFIG_PACKAGE_luci-app-frpc=y
-   121|CONFIG_PACKAGE_frpc=y
-   122|CONFIG_PACKAGE_luci-app-frps=y
-   123|CONFIG_PACKAGE_frps=y
-   124|CONFIG_PACKAGE_luci-app-openclash=y
-   125|CONFIG_PACKAGE_luci-app-opkg=y
-   126|CONFIG_PACKAGE_luci-app-ramfree=y
-   127|CONFIG_PACKAGE_luci-app-wechatpush=y
-   128|CONFIG_PACKAGE_luci-app-sqm=y
-   129|CONFIG_PACKAGE_luci-app-vlmcsd=y
-   130|CONFIG_PACKAGE_luci-app-unblockneteasemusic=y
-   131|CONFIG_PACKAGE_luci-app-upnp=y
-   132|CONFIG_PACKAGE_luci-app-usb-printer=y
-   133|CONFIG_PACKAGE_luci-app-services-wolplus=y
-   134|CONFIG_PACKAGE_luci-app-xlnetacc=y
-   135|CONFIG_PACKAGE_luci-app-zerotier=y
-   136|CONFIG_PACKAGE_luci-app-tailscale=y
-   137|CONFIG_PACKAGE_luci-app-watchcat=y
-   138|CONFIG_PACKAGE_luci-app-natmapt=y
-   139|CONFIG_PACKAGE_stuntman-client=y
-   140|CONFIG_PACKAGE_luci-app-oaf=y
-   141|CONFIG_PACKAGE_zerotier=y
-   142|CONFIG_PACKAGE_tailscale=y
-   143|CONFIG_PACKAGE_coremark=y
-   144|CONFIG_PACKAGE_htop=y
-   145|# CONFIG_PACKAGE_subconverter=y
-   146|CONFIG_PACKAGE_kmod-shortcut-fe-cm=y
-   147|CONFIG_PACKAGE_kmod-fast-classifier=y
-   148|# CONFIG_PACKAGE_natflow-boot=y
-   149|CONFIG_PACKAGE_luci-app-nikki=y
-   150|CONFIG_PACKAGE_luci-app-filemanager=y
-   151|CONFIG_PACKAGE_luci-app-einat=y
-   152|CONFIG_PACKAGE_luci-app-bandix=y
-   153|
-   154|### SSRP ###
-   155|#CONFIG_PACKAGE_luci-app-ssr-plus=y
-   156|#CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Shadowsocks_Rust_Client=y
-   157|#CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Shadowsocks_Rust_Server=y
-   158|#CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Xray=y
-   159|#CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Tuic_Client=y
-   160|#CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Kcptun=y
-   161|#CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_ShadowsocksR_Libev_Client=y
-   162|#CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_ShadowsocksR_Libev_Server=y
-   163|
-   164|### PASSWALL ###
-   165|CONFIG_PACKAGE_luci-app-passwall=y
-   166|
-   167|### OpenClash ###
-   168|
-   169|
-   170|### THEME ###
-   171|CONFIG_PACKAGE_luci-theme-argon=y
-   172|CONFIG_PACKAGE_luci-theme-bootstrap=y
-   173|
-   174|### RESET ###
-   175|CONFIG_PACKAGE_kmod-gpio-button-hotplug=y
-   176|
-   177|### SHARE NETWORK ###
-   178|#CONFIG_PACKAGE_usbmuxd=y
-   179|#CONFIG_PACKAGE_kmod-usb-net-rndis=y
-   180|#CONFIG_PACKAGE_kmod-usb-net-ipheth=y
-   181|
-   182|### BBRv3 ###
-   183|CONFIG_PACKAGE_kmod-tcp-bbr=y
-   184|
-   185|### OPENSSL ###
-   186|CONFIG_OPENSSL_ENGINE=y
-   187|CONFIG_OPENSSL_OPTIMIZE_SPEED=y
-   188|CONFIG_OPENSSL_WITH_ASM=y
-   189|# CONFIG_OPENSSL_WITH_ERROR_MESSAGES is not set
-   190|CONFIG_PACKAGE_libopenssl-conf=y
-   191|CONFIG_PACKAGE_libopenssl-devcrypto=y
-   192|CONFIG_PACKAGE_libopenssl-legacy=y
-   193|CONFIG_PACKAGE_libcurl=y
-   194|CONFIG_LIBCURL_OPENSSL=y
-   195|# CONFIG_LIBCURL_MBEDTLS is not set
-   196|# CONFIG_LIBCURL_WOLFSSL is not set
-   197|# CONFIG_LIBCURL_GNUTLS is not set
-   198|# CONFIG_LIBCURL_NOSSL is not set
-   199|
-   200|### OTHERS ###
-   201|CONFIG_PACKAGE_kmod-crypto-cmac=y
-   202|CONFIG_PACKAGE_kmod-crypto-ccm=y
-   203|
-   204|### CRYPTO ###
-   205|CONFIG_PACKAGE_kmod-crypto-aead=y
-   206|CONFIG_PACKAGE_kmod-crypto-arc4=y
-   207|CONFIG_PACKAGE_kmod-crypto-authenc=y
-   208|CONFIG_PACKAGE_kmod-crypto-blake2b=y
-   209|CONFIG_PACKAGE_kmod-crypto-cbc=y
-   210|CONFIG_PACKAGE_kmod-crypto-ccm=y
-   211|CONFIG_PACKAGE_kmod-crypto-chacha20poly1305=y
-   212|CONFIG_PACKAGE_kmod-crypto-cmac=y
-   213|CONFIG_PACKAGE_kmod-crypto-crc32=y
-   214|CONFIG_PACKAGE_kmod-crypto-crc32c=y
-   215|CONFIG_PACKAGE_kmod-crypto-ctr=y
-   216|CONFIG_PACKAGE_kmod-crypto-cts=y
-   217|CONFIG_PACKAGE_kmod-crypto-deflate=y
-   218|CONFIG_PACKAGE_kmod-crypto-des=y
-   219|CONFIG_PACKAGE_kmod-crypto-ecb=y
-   220|CONFIG_PACKAGE_kmod-crypto-ecdh=y
-   221|CONFIG_PACKAGE_kmod-crypto-echainiv=y
-   222|CONFIG_PACKAGE_kmod-crypto-gcm=y
-   223|CONFIG_PACKAGE_kmod-crypto-geniv=y
-   224|CONFIG_PACKAGE_kmod-crypto-gf128=y
-   225|CONFIG_PACKAGE_kmod-crypto-ghash=y
-   226|CONFIG_PACKAGE_kmod-crypto-hash=y
-   227|CONFIG_PACKAGE_kmod-crypto-hmac=y
-   228|CONFIG_PACKAGE_kmod-crypto-kpp=y
-   229|CONFIG_PACKAGE_kmod-crypto-md4=y
-   230|CONFIG_PACKAGE_kmod-crypto-md5=y
-   231|CONFIG_PACKAGE_kmod-crypto-null=y
-   232|CONFIG_PACKAGE_kmod-crypto-pcbc=y
-   233|CONFIG_PACKAGE_kmod-crypto-rng=y
-   234|CONFIG_PACKAGE_kmod-crypto-seqiv=y
-   235|CONFIG_PACKAGE_kmod-crypto-sha1=y
-   236|CONFIG_PACKAGE_kmod-crypto-sha256=y
-   237|CONFIG_PACKAGE_kmod-crypto-sha3=y
-   238|CONFIG_PACKAGE_kmod-crypto-sha512=y
-   239|CONFIG_PACKAGE_kmod-crypto-user=y
-   240|CONFIG_PACKAGE_kmod-crypto-xcbc=y
-   241|CONFIG_PACKAGE_kmod-crypto-xxhash=y
-   242|
-   243|### Mediatek PPE & Offload ###
-   244|CONFIG_NET_MEDIATEK_SOC_WED=y
-   245|CONFIG_PACKAGE_kmod-ipt-offload=y
-   246|CONFIG_PACKAGE_kmod-ipt-nat-offload=y
-   248|
-   249|### IRQBalance ###
-   250|CONFIG_PACKAGE_irqbalance=y
-   251|CONFIG_PACKAGE_luci-app-irqbalance=y
-   252|
-   253|### TUN/TAP ###
-   254|CONFIG_TUN=y
-   255|
-   256|### PCIe ASPM Control ###
-   257|CONFIG_PCIEASPM=y
-   258|CONFIG_PCIEASPM_DEFAULT_OFF=y
+     1|     1|### INITIALIZATION ###
+     2|     2|CONFIG_TARGET_mediatek=y
+     3|     3|CONFIG_TARGET_mediatek_filogic=y
+     4|     4|CONFIG_TARGET_mediatek_filogic_DEVICE_bananapi_bpi-r4=y
+     5|     5|CONFIG_TARGET_KERNEL_PARTSIZE=32
+     6|     6|CONFIG_TARGET_ROOTFS_INITRAMFS=n
+     7|     7|CONFIG_TARGET_ROOTFS_PARTSIZE=4096
+     8|     8|CONFIG_ALL_KMODS=y
+     9|     9|CONFIG_DEVEL=y
+    10|    10|# CONFIG_KERNEL_KALLSYMS is not set
+    11|    11|# CONFIG_KERNEL_WERROR is not set
+    12|    12|CONFIG_KERNEL_BUILD_DOMAIN="buildhost"
+    13|    13|CONFIG_KERNEL_BUILD_USER="builder"
+    14|    14|#CONFIG_PACKAGE_r8152-firmware=y
+    15|    15|CONFIG_COLLECT_KERNEL_DEBUG=y
+    16|    16|CONFIG_REPRODUCIBLE_DEBUG_INFO=y
+    17|    17|
+    18|    18|# GCC
+    19|    19|CONFIG_TOOLCHAINOPTS=y
+    20|    20|
+    21|    21|### ZLIB
+    22|    22|CONFIG_ZLIB_OPTIMIZE_SPEED=y
+    23|    23|
+    24|    24|# DAE
+    25|    25|CONFIG_KERNEL_DEBUG_INFO=y
+    26|    26|CONFIG_KERNEL_DEBUG_INFO_REDUCED=n
+    27|    27|CONFIG_KERNEL_DEBUG_INFO_BTF=y
+    28|    28|CONFIG_KERNEL_CGROUPS=y
+    29|    29|CONFIG_KERNEL_CGROUP_BPF=y
+    30|    30|CONFIG_KERNEL_BPF_EVENTS=y
+    31|    31|CONFIG_BPF_TOOLCHAIN_HOST=y
+    32|    32|CONFIG_KERNEL_XDP_SOCKETS=y
+    33|    33|CONFIG_PACKAGE_kmod-xdp-sockets-diag=y
+    34|    34|CONFIG_PACKAGE_luci-app-dae=y
+    35|    35|
+    36|    36|# SAVING RAM FOR DAE
+    37|    37|CONFIG_PACKAGE_zram-swap=y
+    38|    38|CONFIG_PACKAGE_kmod-lib-lz4=y
+    39|    39|CONFIG_PACKAGE_kmod-lib-lzo=y
+    40|    40|CONFIG_PACKAGE_kmod-lib-zstd=y
+    41|    41|
+    42|    42|### AGGRESSIVE ###
+    43|    43|CONFIG_USE_GC_SECTIONS=y
+    44|    44|CONFIG_USE_LTO=y
+    45|    45|
+    46|    46|# RNGD
+    47|    47|CONFIG_PACKAGE_urandom-seed=y
+    48|    48|CONFIG_PACKAGE_urngd=y
+    49|    49|
+    50|    50|### BASIC ###
+    51|    51|CONFIG_PACKAGE_kmod-hwmon-pwmfan=y
+    52|    52|CONFIG_PACKAGE_addition-trans-zh=y
+    53|    53|CONFIG_PACKAGE_autocore-arm=y
+    54|    54|CONFIG_PACKAGE_ethtool-full=y
+    55|    55|CONFIG_PACKAGE_dnsmasq-full=y
+    56|    56|CONFIG_PACKAGE_dnsmasq_full_ipset=y
+    57|    57|# CONFIG_PACKAGE_dnsmasq_full_broken_rtc is not set
+    58|    58|# CONFIG_PACKAGE_dnsmasq is not set
+    59|    59|CONFIG_PACKAGE_kmod-fs-f2fs=y
+    60|    60|CONFIG_PACKAGE_libustream-openssl=y
+    61|    61|# CONFIG_PACKAGE_libustream-wolfssl is not set
+    62|    62|CONFIG_PACKAGE_wget-ssl=y
+    63|    63|
+    64|    64|### DDNS ###
+    65|    65|CONFIG_PACKAGE_luci-app-ddns=y
+    66|    66|CONFIG_PACKAGE_ddns-scripts=y
+    67|    67|CONFIG_PACKAGE_ddns-scripts-cloudflare=y
+    68|    68|CONFIG_PACKAGE_ddns-scripts-dnspod=y
+    69|    69|CONFIG_PACKAGE_ddns-scripts-services=y
+    70|    70|CONFIG_PACKAGE_ddns-scripts-aliyun=y
+    71|    71|CONFIG_PACKAGE_bind-host=y
+    72|    72|
+    73|    73|### 22.03 ###
+    74|    74|# CONFIG_PACKAGE_firewall is not set
+    75|    75|CONFIG_PACKAGE_firewall4=y
+    76|    76|CONFIG_PACKAGE_kmod-nft-offload=y
+    77|    77|CONFIG_PACKAGE_kmod-nft-fullcone=y
+    78|    78|# CONFIG_PACKAGE_arptables-legacy is not set
+    79|    79|CONFIG_PACKAGE_arptables-nft=y
+    80|    80|# CONFIG_PACKAGE_ebtables-legacy is not set
+    81|    81|#CONFIG_PACKAGE_ebtables-nft=y
+    82|    82|# CONFIG_PACKAGE_ip6tables-legacy is not set
+    83|    83|CONFIG_PACKAGE_ip6tables-nft=y
+    84|    84|# CONFIG_PACKAGE_xtables-legacy is not set
+    85|    85|CONFIG_PACKAGE_xtables-nft=y
+    86|    86|# CONFIG_PACKAGE_iptables-legacy is not set
+    87|    87|CONFIG_PACKAGE_iptables-nft=y
+    88|    88|CONFIG_PACKAGE_iptables-mod-conntrack-extra=y
+    89|    89|CONFIG_PACKAGE_iptables-mod-iprange=y
+    90|    90|CONFIG_PACKAGE_iptables-mod-nat-extra=y
+    91|    91|CONFIG_PACKAGE_iptables-mod-socket=y
+    92|    92|CONFIG_PACKAGE_iptables-mod-tproxy=y
+    93|    93|# CONFIG_PACKAGE_miniupnpd-iptables is not set
+    94|    94|CONFIG_PACKAGE_miniupnpd-nftables=y
+    95|    95|CONFIG_PACKAGE_nat6=y
+    96|    96|
+    97|    97|### LUCI ###
+    98|    98|CONFIG_LUCI_LANG_zh_Hans=y
+    99|    99|CONFIG_LUCI_LANG_en=y
+   100|   100|# CONFIG_LUCI_CSSTIDY is not set
+   101|   101|# CONFIG_LUCI_JSMIN is not set
+   102|   102|CONFIG_PACKAGE_luci-nginx=y
+   103|   103|CONFIG_PACKAGE_luci-compat=y
+   104|   104|
+   105|   105|### APPLICATION ###
+   106|   106|CONFIG_PACKAGE_luci-app-homeproxy=y
+   107|   107|CONFIG_PACKAGE_luci-app-ap-modem=y
+   108|   108|CONFIG_PACKAGE_luci-app-oled=y
+   109|   109|CONFIG_PACKAGE_luci-proto-wireguard=y
+   110|   110|CONFIG_PACKAGE_qrencode=y
+   111|   111|CONFIG_PACKAGE_luci-app-3cat=y
+   112|   112|CONFIG_PACKAGE_luci-app-argon-config=y
+   113|   113|CONFIG_PACKAGE_luci-app-arpbind=y
+   114|   114|CONFIG_PACKAGE_luci-app-taskplan=y
+   115|   115|CONFIG_PACKAGE_luci-app-partexp=y
+   116|   116|CONFIG_PACKAGE_luci-app-airconnect=y
+   117|   117|CONFIG_PACKAGE_luci-app-mosdns=y
+   118|   118|CONFIG_PACKAGE_luci-app-cpufreq=y
+   119|   119|CONFIG_PACKAGE_luci-app-cpulimit=y
+   120|   120|CONFIG_PACKAGE_luci-app-frpc=y
+   121|   121|CONFIG_PACKAGE_frpc=y
+   122|   122|CONFIG_PACKAGE_luci-app-frps=y
+   123|   123|CONFIG_PACKAGE_frps=y
+   124|   124|CONFIG_PACKAGE_luci-app-openclash=y
+   125|   125|CONFIG_PACKAGE_luci-app-opkg=y
+   126|   126|CONFIG_PACKAGE_luci-app-ramfree=y
+   127|   127|CONFIG_PACKAGE_luci-app-wechatpush=y
+   128|   128|CONFIG_PACKAGE_luci-app-sqm=y
+   129|   129|CONFIG_PACKAGE_luci-app-vlmcsd=y
+   130|   130|CONFIG_PACKAGE_luci-app-unblockneteasemusic=y
+   131|   131|CONFIG_PACKAGE_luci-app-upnp=y
+   132|   132|CONFIG_PACKAGE_luci-app-usb-printer=y
+   133|   133|CONFIG_PACKAGE_luci-app-services-wolplus=y
+   134|   134|CONFIG_PACKAGE_luci-app-xlnetacc=y
+   135|   135|CONFIG_PACKAGE_luci-app-zerotier=y
+   136|   136|CONFIG_PACKAGE_luci-app-tailscale=y
+   137|   137|CONFIG_PACKAGE_luci-app-watchcat=y
+   138|   138|CONFIG_PACKAGE_luci-app-natmapt=y
+   139|   139|CONFIG_PACKAGE_stuntman-client=y
+   140|   140|CONFIG_PACKAGE_luci-app-oaf=y
+   141|   141|CONFIG_PACKAGE_zerotier=y
+   142|   142|CONFIG_PACKAGE_tailscale=y
+   143|   143|CONFIG_PACKAGE_coremark=y
+   144|   144|CONFIG_PACKAGE_htop=y
+   145|   145|# CONFIG_PACKAGE_subconverter=y
+   146|   146|CONFIG_PACKAGE_kmod-shortcut-fe-cm=y
+   147|   147|CONFIG_PACKAGE_kmod-fast-classifier=y
+   148|   148|# CONFIG_PACKAGE_natflow-boot=y
+   149|   149|CONFIG_PACKAGE_luci-app-nikki=y
+   150|   150|CONFIG_PACKAGE_luci-app-filemanager=y
+   151|   151|CONFIG_PACKAGE_luci-app-einat=y
+   152|   152|CONFIG_PACKAGE_luci-app-bandix=y
+   153|   153|
+   154|   154|### SSRP ###
+   155|   155|#CONFIG_PACKAGE_luci-app-ssr-plus=y
+   156|   156|#CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Shadowsocks_Rust_Client=y
+   157|   157|#CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Shadowsocks_Rust_Server=y
+   158|   158|#CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Xray=y
+   159|   159|#CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Tuic_Client=y
+   160|   160|#CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Kcptun=y
+   161|   161|#CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_ShadowsocksR_Libev_Client=y
+   162|   162|#CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_ShadowsocksR_Libev_Server=y
+   163|   163|
+   164|   164|### PASSWALL ###
+   165|   165|CONFIG_PACKAGE_luci-app-passwall=y
+   166|   166|
+   167|   167|### OpenClash ###
+   168|   168|
+   169|   169|
+   170|   170|### THEME ###
+   171|   171|CONFIG_PACKAGE_luci-theme-argon=y
+   172|   172|CONFIG_PACKAGE_luci-theme-bootstrap=y
+   173|   173|
+   174|   174|### RESET ###
+   175|   175|CONFIG_PACKAGE_kmod-gpio-button-hotplug=y
+   176|   176|
+   177|   177|### SHARE NETWORK ###
+   178|   178|#CONFIG_PACKAGE_usbmuxd=y
+   179|   179|#CONFIG_PACKAGE_kmod-usb-net-rndis=y
+   180|   180|#CONFIG_PACKAGE_kmod-usb-net-ipheth=y
+   181|   181|
+   182|   182|### BBRv3 ###
+   183|   183|CONFIG_PACKAGE_kmod-tcp-bbr=y
+   184|   184|
+   185|   185|### OPENSSL ###
+   186|   186|CONFIG_OPENSSL_ENGINE=y
+   187|   187|CONFIG_OPENSSL_OPTIMIZE_SPEED=y
+   188|   188|CONFIG_OPENSSL_WITH_ASM=y
+   189|   189|# CONFIG_OPENSSL_WITH_ERROR_MESSAGES is not set
+   190|   190|CONFIG_PACKAGE_libopenssl-conf=y
+   191|   191|CONFIG_PACKAGE_libopenssl-devcrypto=y
+   192|   192|CONFIG_PACKAGE_libopenssl-legacy=y
+   193|   193|CONFIG_PACKAGE_libcurl=y
+   194|   194|CONFIG_LIBCURL_OPENSSL=y
+   195|   195|# CONFIG_LIBCURL_MBEDTLS is not set
+   196|   196|# CONFIG_LIBCURL_WOLFSSL is not set
+   197|   197|# CONFIG_LIBCURL_GNUTLS is not set
+   198|   198|# CONFIG_LIBCURL_NOSSL is not set
+   199|   199|
+   200|   200|### OTHERS ###
+   201|   201|CONFIG_PACKAGE_kmod-crypto-cmac=y
+   202|   202|CONFIG_PACKAGE_kmod-crypto-ccm=y
+   203|   203|
+   204|   204|### CRYPTO ###
+   205|   205|CONFIG_PACKAGE_kmod-crypto-aead=y
+   206|   206|CONFIG_PACKAGE_kmod-crypto-arc4=y
+   207|   207|CONFIG_PACKAGE_kmod-crypto-authenc=y
+   208|   208|CONFIG_PACKAGE_kmod-crypto-blake2b=y
+   209|   209|CONFIG_PACKAGE_kmod-crypto-cbc=y
+   210|   210|CONFIG_PACKAGE_kmod-crypto-ccm=y
+   211|   211|CONFIG_PACKAGE_kmod-crypto-chacha20poly1305=y
+   212|   212|CONFIG_PACKAGE_kmod-crypto-cmac=y
+   213|   213|CONFIG_PACKAGE_kmod-crypto-crc32=y
+   214|   214|CONFIG_PACKAGE_kmod-crypto-crc32c=y
+   215|   215|CONFIG_PACKAGE_kmod-crypto-ctr=y
+   216|   216|CONFIG_PACKAGE_kmod-crypto-cts=y
+   217|   217|CONFIG_PACKAGE_kmod-crypto-deflate=y
+   218|   218|CONFIG_PACKAGE_kmod-crypto-des=y
+   219|   219|CONFIG_PACKAGE_kmod-crypto-ecb=y
+   220|   220|CONFIG_PACKAGE_kmod-crypto-ecdh=y
+   221|   221|CONFIG_PACKAGE_kmod-crypto-echainiv=y
+   222|   222|CONFIG_PACKAGE_kmod-crypto-gcm=y
+   223|   223|CONFIG_PACKAGE_kmod-crypto-geniv=y
+   224|   224|CONFIG_PACKAGE_kmod-crypto-gf128=y
+   225|   225|CONFIG_PACKAGE_kmod-crypto-ghash=y
+   226|   226|CONFIG_PACKAGE_kmod-crypto-hash=y
+   227|   227|CONFIG_PACKAGE_kmod-crypto-hmac=y
+   228|   228|CONFIG_PACKAGE_kmod-crypto-kpp=y
+   229|   229|CONFIG_PACKAGE_kmod-crypto-md4=y
+   230|   230|CONFIG_PACKAGE_kmod-crypto-md5=y
+   231|   231|CONFIG_PACKAGE_kmod-crypto-null=y
+   232|   232|CONFIG_PACKAGE_kmod-crypto-pcbc=y
+   233|   233|CONFIG_PACKAGE_kmod-crypto-rng=y
+   234|   234|CONFIG_PACKAGE_kmod-crypto-seqiv=y
+   235|   235|CONFIG_PACKAGE_kmod-crypto-sha1=y
+   236|   236|CONFIG_PACKAGE_kmod-crypto-sha256=y
+   237|   237|CONFIG_PACKAGE_kmod-crypto-sha3=y
+   238|   238|CONFIG_PACKAGE_kmod-crypto-sha512=y
+   239|   239|CONFIG_PACKAGE_kmod-crypto-user=y
+   240|   240|CONFIG_PACKAGE_kmod-crypto-xcbc=y
+   241|   241|CONFIG_PACKAGE_kmod-crypto-xxhash=y
+   242|   242|
+   243|   243|### Mediatek PPE & Offload ###
+   244|   244|CONFIG_NET_MEDIATEK_SOC_WED=y
+   245|   245|CONFIG_PACKAGE_kmod-ipt-offload=y
+   246|   246|CONFIG_PACKAGE_kmod-ipt-nat-offload=y
+   247|   248|
+   248|   249|### IRQBalance ###
+   249|   250|CONFIG_PACKAGE_irqbalance=y
+   250|   251|CONFIG_PACKAGE_luci-app-irqbalance=y
+   251|   252|
+   252|   253|### TUN/TAP ###
+   253|   254|CONFIG_TUN=y
+   254|   255|
+   255|   256|### PCIe ASPM Control ###
+   256|   257|CONFIG_PCIEASPM=y
+   257|   258|CONFIG_PCIEASPM_DEFAULT_OFF=y
+   258|   259|
    259|
-
-### Flow Offload & SFE ###
-CONFIG_NF_FLOW_TABLE=y
-CONFIG_PACKAGE_kmod-ipt-offload=y
-CONFIG_PACKAGE_kmod-nft-offload=y
-CONFIG_PACKAGE_kmod-fast-classifier=y
-CONFIG_SHORTCUT_FE=y
-
-### Hardware Crypto (MT7988 SAOT) ###
-CONFIG_CRYPTO_DEV_MEDIATEK=y
-CONFIG_PACKAGE_kmod-crypto-hw=y
-
-### Extreme Optimization: CPU Performance Mode ###
-CONFIG_CPU_FREQ_GOV_PERFORMANCE=y
-# Disable other governors to force performance
-# CONFIG_CPU_FREQ_GOV_ONDEMAND is not set
-# CONFIG_CPU_FREQ_GOV_SCHEDUTIL is not set
-
-### Extreme Optimization: Transparent Huge Pages ###
-CONFIG_TRANSPARENT_HUGEPAGES=y
-CONFIG_TRANSPARENT_HUGEPAGE_ALWAYS=y
+   260|### Flow Offload & SFE ###
+   261|CONFIG_NF_FLOW_TABLE=y
+   262|CONFIG_PACKAGE_kmod-ipt-offload=y
+   263|CONFIG_PACKAGE_kmod-nft-offload=y
+   264|CONFIG_PACKAGE_kmod-fast-classifier=y
+   265|CONFIG_SHORTCUT_FE=y
+   266|
+   267|### Hardware Crypto (MT7988 SAOT) ###
+   268|CONFIG_CRYPTO_DEV_MEDIATEK=y
+   269|CONFIG_PACKAGE_kmod-crypto-hw=y
+   270|
+   271|### Extreme Optimization: CPU Performance Mode ###
+# CONFIG_CPU_FREQ_GOV_PERFORMANCE is not set
+   273|# Disable other governors to force performance
+CONFIG_CPU_FREQ_GOV_SCHEDUTIL=y
+   276|
+   277|### Extreme Optimization: Transparent Huge Pages ###
+#    278|CONFIG_TRANSPARENT_HUGEPAGES=y
+#    279|CONFIG_TRANSPARENT_HUGEPAGE_ALWAYS=y
+   280|

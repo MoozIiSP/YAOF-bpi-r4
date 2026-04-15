@@ -297,3 +297,6 @@ CONFIG_DEFAULT_DEADLINE=y
 ### Network Latency (FQ_CODEL) ###
 CONFIG_NET_SCH_FQ_CODEL=y
 CONFIG_NET_SCH_CAKE=y
+
+### Lock Kernel to 6.6 ###
+CONFIG_LINUX_6_6=y

@@ -277,3 +277,23 @@ CONFIG_CPU_FREQ_GOV_SCHEDUTIL=y
 #    278|CONFIG_TRANSPARENT_HUGEPAGES=y
 #    279|CONFIG_TRANSPARENT_HUGEPAGE_ALWAYS=y
    280|
+### System Responsiveness ###
+# Preemptible Kernel (Voluntary) - Balances throughput and latency
+CONFIG_PREEMPT_VOLUNTARY=y
+# CONFIG_PREEMPT_NONE is not set
+# CONFIG_PREEMPT is not set
+
+# Timer Frequency (250Hz is good balance, 1000Hz is desktop)
+CONFIG_HZ_250=y
+CONFIG_HZ=250
+
+# I/O Schedulers
+CONFIG_IOSCHED_BFQ=y
+CONFIG_IOSCHED_DEADLINE=y
+CONFIG_DEFAULT_DEADLINE=y
+# CONFIG_DEFAULT_CFQ is not set
+# CONFIG_DEFAULT_NOOP is not set
+
+### Network Latency (FQ_CODEL) ###
+CONFIG_NET_SCH_FQ_CODEL=y
+CONFIG_NET_SCH_CAKE=y

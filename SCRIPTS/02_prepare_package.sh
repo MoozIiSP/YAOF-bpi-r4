@@ -222,24 +222,6 @@ cp -rf ../lede/target/linux/x86/patches-6.6/996-intel-igc-i225-i226-disable-eee.
 # btf
 cp -rf ../PATCH/kernel/btf/* ./target/linux/generic/hack-6.6/
 
-### 获取额外的基础软件包 ###
-# 更换为 ImmortalWrt Uboot 以及 Target
-rm -rf ./target/linux/rockchip
-cp -rf ../immortalwrt_24/target/linux/rockchip ./target/linux/rockchip
-cp -rf ../PATCH/kernel/rockchip/* ./target/linux/rockchip/patches-6.6/
-#wget https://github.com/immortalwrt/immortalwrt/raw/refs/tags/v23.05.4/target/linux/rockchip/patches-5.15/991-arm64-dts-rockchip-add-more-cpu-operating-points-for.patch -O target/linux/rockchip/patches-6.6/991-arm64-dts-rockchip-add-more-cpu-operating-points-for.patch
-rm -rf package/boot/{rkbin,uboot-rockchip,arm-trusted-firmware-rockchip}
-cp -rf ../immortalwrt_24/package/boot/uboot-rockchip ./package/boot/uboot-rockchip
-cp -rf ../immortalwrt_24/package/boot/arm-trusted-firmware-rockchip ./package/boot/arm-trusted-firmware-rockchip
-sed -i '/REQUIRE_IMAGE_METADATA/d' target/linux/rockchip/armv8/base-files/lib/upgrade/platform.sh
-# Disable Mitigations
-sed -i 's,rootwait,rootwait mitigations=off,g' target/linux/rockchip/image/default.bootscript
-sed -i 's,@CMDLINE@ noinitrd,noinitrd mitigations=off,g' target/linux/x86/image/grub-efi.cfg
-sed -i 's,@CMDLINE@ noinitrd,noinitrd mitigations=off,g' target/linux/x86/image/grub-iso.cfg
-sed -i 's,@CMDLINE@ noinitrd,noinitrd mitigations=off,g' target/linux/x86/image/grub-pc.cfg
-# nanopi
-sed -i 's,CONFIG_PREEMPT=y,CONFIG_PREEMPT_NONE_BUILD=y,g' target/linux/rockchip/armv8/config-6.6
-
 ### ADD PKG 部分 ###
 cp -rf ../OpenWrt-Add ./package/new
 rm -rf feeds/packages/net/{xray-core,v2ray-core,v2ray-geodata,sing-box,frp,microsocks,shadowsocks-libev,zerotier,daed}

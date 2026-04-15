@@ -14,9 +14,6 @@ clone_repo() {
 
 # 定义一些变量，存储仓库地址和分支名
 latest_release="$(curl -s https://github.com/openwrt/openwrt/tags | grep -Eo "v[0-9\.]+\-*r*c*[0-9]*.tar.gz" | sed -n '/[2-9][4-9]/p' | sed -n 1p | sed 's/.tar.gz//g')"
-immortalwrt_repo="https://github.com/immortalwrt/immortalwrt.git"
-immortalwrt_pkg_repo="https://github.com/immortalwrt/packages.git"
-immortalwrt_luci_repo="https://github.com/immortalwrt/luci.git"
 lede_repo="https://github.com/coolsnowwolf/lede.git"
 lede_luci_repo="https://github.com/coolsnowwolf/luci.git"
 lede_pkg_repo="https://github.com/coolsnowwolf/packages.git"
@@ -53,8 +50,6 @@ luci_theme_design_repo="https://github.com/SAENE/luci-theme-design"
 clone_repo $openwrt_repo $latest_release openwrt &
 #clone_repo $openwrt_repo openwrt-24.10 openwrt &
 clone_repo $openwrt_repo openwrt-24.10 openwrt_snap &
-clone_repo $immortalwrt_repo openwrt-24.10 immortalwrt_24 &
-#clone_repo $immortalwrt_repo openwrt-23.05 immortalwrt_23 &
 
 clone_repo $lede_repo master lede &
 clone_repo $lede_pkg_repo master lede_pkg_ma &
@@ -79,7 +74,6 @@ rm -rf ./openwrt_snap/package/firmware ./openwrt_snap/package/kernel ./openwrt_s
 cp -rf ./openwrt_snap/package/* ./openwrt/package/
 cp -rf ./openwrt_snap/feeds.conf.default ./openwrt/feeds.conf.default
 # 修复缺失的 kmod-drm-lima
-cp -rf ./immortalwrt_24/package/kernel/linux/modules/video.mk ./openwrt/package/kernel/linux/modules/
 
 # 退出脚本
 exit 0

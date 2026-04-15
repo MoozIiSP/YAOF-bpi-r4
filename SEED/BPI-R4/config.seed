@@ -267,3 +267,13 @@ CONFIG_SHORTCUT_FE=y
 ### Hardware Crypto (MT7988 SAOT) ###
 CONFIG_CRYPTO_DEV_MEDIATEK=y
 CONFIG_PACKAGE_kmod-crypto-hw=y
+
+### Extreme Optimization: CPU Performance Mode ###
+CONFIG_CPU_FREQ_GOV_PERFORMANCE=y
+# Disable other governors to force performance
+# CONFIG_CPU_FREQ_GOV_ONDEMAND is not set
+# CONFIG_CPU_FREQ_GOV_SCHEDUTIL is not set
+
+### Extreme Optimization: Transparent Huge Pages ###
+CONFIG_TRANSPARENT_HUGEPAGES=y
+CONFIG_TRANSPARENT_HUGEPAGE_ALWAYS=y

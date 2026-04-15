@@ -239,3 +239,20 @@ CONFIG_PACKAGE_kmod-crypto-sha512=y
 CONFIG_PACKAGE_kmod-crypto-user=y
 CONFIG_PACKAGE_kmod-crypto-xcbc=y
 CONFIG_PACKAGE_kmod-crypto-xxhash=y
+
+### Mediatek PPE & Offload ###
+CONFIG_NET_MEDIATEK_SOC_WED=y
+CONFIG_PACKAGE_kmod-ipt-offload=y
+CONFIG_PACKAGE_kmod-ipt-nat-offload=y
+CONFIG_MTK_NET_PPE=y
+
+### IRQBalance ###
+CONFIG_PACKAGE_irqbalance=y
+CONFIG_PACKAGE_luci-app-irqbalance=y
+
+### TUN/TAP ###
+CONFIG_TUN=y
+
+### PCIe ASPM Control ###
+CONFIG_PCIEASPM=y
+CONFIG_PCIEASPM_DEFAULT_OFF=y

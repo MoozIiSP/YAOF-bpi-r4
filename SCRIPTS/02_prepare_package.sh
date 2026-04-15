@@ -43,7 +43,7 @@ fi
 #   MTK_FEED_URL=...               feeds 仓库地址（可选，留空用默认）
 #   MTK_FEED_BRANCH=...            分支（可选，默认尝试与底座版本匹配）
 # - MTK_SDK_TARBALL=/path/to.tgz   使用离线 SDK 包（可选）
-if [ "${USE_MTK_FEED:-0}" = "1" ]; then
+if [ "1" = "1" ]; then  # [MODIFIED] Force enable MTK Feed
   echo "[MTK] 启用 MediaTek feeds 集成"
   MTK_FEED_URL=${MTK_FEED_URL:-https://git01.mediatek.com/openwrt/mtk-openwrt-feeds.git}
   # 优先尝试与 openwrt-24.10 对齐；如需其他版本，请在 CI 变量中覆盖
@@ -65,6 +65,34 @@ if [ -n "${MTK_SDK_TARBALL:-}" ]; then
       echo "src-link mtk-sdk ../mtk-sdk/feeds" >> feeds.conf.default
     fi
   fi
+fi
+
+### Custom Bootloader (Yuzhii0718) & GPT for A/B Partition ###
+if [ -d "../bl-mt798x-dhcpd" ]; then
+  echo "[BOOT] Found custom bootloader repo: bl-mt798x-dhcpd"
+  
+  # 1. Replace Arm Trusted Firmware (ATF)
+  if [ -d "../bl-mt798x-dhcpd/atf-20260123" ]; then
+    rm -rf ./package/boot/arm-trusted-firmware-mediatek
+    cp -rf ../bl-mt798x-dhcpd/atf-20260123 ./package/boot/arm-trusted-firmware-mediatek
+    echo "[BOOT] Replaced ATF with bl-mt798x-dhcpd version"
+  fi
+  
+  # 2. Replace U-Boot
+  if [ -d "../bl-mt798x-dhcpd/uboot-mtk-20250711" ]; then
+    rm -rf ./package/boot/uboot-mediatek
+    cp -rf ../bl-mt798x-dhcpd/uboot-mtk-20250711 ./package/boot/uboot-mediatek
+    echo "[BOOT] Replaced U-Boot with bl-mt798x-dhcpd version"
+  fi
+  
+  # 3. Inject A/B Partition GPT Definition
+  if [ -f "../PATCH/gpt/bpi-r4-ab.json" ]; then
+    mkdir -p ./package/boot/arm-trusted-firmware-mediatek/src/gpt
+    cp ../PATCH/gpt/bpi-r4-ab.json ./package/boot/arm-trusted-firmware-mediatek/src/gpt/
+    echo "[GPT] Injected bpi-r4-ab.json for A/B Partition support"
+  fi
+else
+  echo "[BOOT] Custom bootloader repo not found, using default OpenWrt sources"
 fi
 
 # 使用 O2 级别的优化

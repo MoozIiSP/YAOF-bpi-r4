@@ -256,3 +256,14 @@
    257|CONFIG_PCIEASPM=y
    258|CONFIG_PCIEASPM_DEFAULT_OFF=y
    259|
+
+### Flow Offload & SFE ###
+CONFIG_NF_FLOW_TABLE=y
+CONFIG_PACKAGE_kmod-ipt-offload=y
+CONFIG_PACKAGE_kmod-nft-offload=y
+CONFIG_PACKAGE_kmod-fast-classifier=y
+CONFIG_SHORTCUT_FE=y
+
+### Hardware Crypto (MT7988 SAOT) ###
+CONFIG_CRYPTO_DEV_MEDIATEK=y
+CONFIG_PACKAGE_kmod-crypto-hw=y

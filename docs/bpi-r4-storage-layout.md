@@ -91,3 +91,15 @@ Still worth refining later:
 1. Make NAND image constraints even more explicit in package selection and release notes
 2. Verify bootloader / partition behavior on real hardware for each medium
 3. Decide whether SD and eMMC should diverge further in GPT sizing after field testing
+
+## 6. Validation checklist
+
+For hands-on testing after a build or release, use:
+
+- `docs/bpi-r4-validation-checklist.md`
+
+That checklist covers:
+- SD first-boot expansion behavior
+- eMMC 8GB-safe GPT validation
+- SPI-NAND minimal-system / recovery validation
+- cross-media regression checks

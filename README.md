@@ -142,6 +142,7 @@ BPI-R4 典型关注点包括：
 - `SCRIPTS/BPI-R4/02_target_only.sh` 包含 BPI-R4 定向处理
 - `BPI-R4-PRO` 工作流已存在，但是否完整可用请以当前分支内容与发布结果为准
 - `docs/bpi-r4-storage-layout.md` 记录 NAND / eMMC / SD 的介质分工与分区策略
+- `docs/bpi-r4-validation-checklist.md` 提供 SD / eMMC / SPI-NAND 的上板验证清单
 
 ---
 
@@ -197,6 +198,11 @@ make -j"$(nproc)"
 - `BPI-R4-SD`：A/B 测试镜像，首启自动扩最后的 `data` 分区
 - `BPI-R4-EMMC`：8GB-safe 的主力 eMMC A/B 布局
 - `BPI-R4-SNAND`：最小可启动 NAND 系统，强调 boot / recovery / overlay
+
+建议上板前同时阅读：
+
+- `docs/bpi-r4-storage-layout.md`
+- `docs/bpi-r4-validation-checklist.md`
 
 ---
 

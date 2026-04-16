@@ -110,9 +110,11 @@ stages:
   - TARGET: "BPI-R4"
     SCRIPT_DIR: "BPI-R4"
     ARCH: "mediatek/filogic"
-  # - TARGET: "BPI-R4-PRO"
-  #   SCRIPT_DIR: "BPI-R4-PRO"
-  #   ARCH: "mediatek/filogic"
+
+# NOTE:
+# BPI-R4-PRO is intentionally not enabled here yet.
+# The GitHub workflow placeholder exists, but GitLab CI should stay aligned
+# with currently verified build targets until the PRO path is fully tested.
 
 #
 # Matrix Build Job

@@ -6,7 +6,7 @@
   <a href="https://github.com/MoozIiSP/YAOF-bpi-r4/releases">
     <img alt="Latest Release" src="https://img.shields.io/github/v/release/MoozIiSP/YAOF-bpi-r4?style=for-the-badge&label=Release">
   </a>
-  <a href="https://github.com/MoozIiSP/YAOF-bpi-r4/blob/24.10/LICENSE">
+  <a href="https://github.com/MoozIiSP/YAOF-bpi-r4/blob/mt7988-24.10/LICENSE">
     <img alt="License" src="https://img.shields.io/github/license/MoozIiSP/YAOF-bpi-r4?style=for-the-badge">
   </a>
   <a href="https://github.com/MoozIiSP/YAOF-bpi-r4/actions/workflows/BPI-R4-OpenWrt.yml">
@@ -153,7 +153,7 @@ BPI-R4 典型关注点包括：
 基础流程：
 
 ```bash
-git clone -b 24.10 https://github.com/MoozIiSP/YAOF-bpi-r4.git
+git clone -b mt7988-24.10 https://github.com/MoozIiSP/YAOF-bpi-r4.git
 cd YAOF-bpi-r4
 
 bash SCRIPTS/01_get_ready.sh

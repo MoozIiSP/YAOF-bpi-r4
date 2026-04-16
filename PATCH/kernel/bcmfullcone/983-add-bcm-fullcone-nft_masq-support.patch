@@ -67,7 +67,7 @@
 +
 +		priv->flags |= NF_NAT_RANGE_MAP_IPS;
 +	}
-
++
  	return nf_ct_netns_get(ctx->net, ctx->family);
  }
  

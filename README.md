@@ -10,10 +10,10 @@
     <img alt="License" src="https://img.shields.io/github/license/MoozIiSP/YAOF-bpi-r4?style=for-the-badge">
   </a>
   <a href="https://github.com/MoozIiSP/YAOF-bpi-r4/actions/workflows/BPI-R4-OpenWrt.yml">
-    <img alt="BPI-R4 Build" src="https://img.shields.io/github/actions/workflow/status/MoozIiSP/YAOF-bpi-r4/BPI-R4-OpenWrt.yml?branch=24.10&style=for-the-badge&label=BPI-R4">
+    <img alt="BPI-R4 Build" src="https://img.shields.io/github/actions/workflow/status/MoozIiSP/YAOF-bpi-r4/BPI-R4-OpenWrt.yml?branch=mt7988-24.10&style=for-the-badge&label=BPI-R4">
   </a>
   <a href="https://github.com/MoozIiSP/YAOF-bpi-r4/actions/workflows/BPI-R4-PRO-OpenWrt.yml">
-    <img alt="BPI-R4-PRO Build" src="https://img.shields.io/github/actions/workflow/status/MoozIiSP/YAOF-bpi-r4/BPI-R4-PRO-OpenWrt.yml?branch=24.10&style=for-the-badge&label=BPI-R4-PRO">
+    <img alt="BPI-R4-PRO Build" src="https://img.shields.io/github/actions/workflow/status/MoozIiSP/YAOF-bpi-r4/BPI-R4-PRO-OpenWrt.yml?branch=mt7988-24.10&style=for-the-badge&label=BPI-R4-PRO">
   </a>
 </p>
 

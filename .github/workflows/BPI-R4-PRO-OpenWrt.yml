@@ -1,4 +1,5 @@
 name: BPI-R4-PRO-OpenWrt
+run-name: BPI-R4-PRO build · ${{ github.ref_name }}
 
 on:
 #  schedule:

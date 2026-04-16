@@ -1,5 +1,6 @@
 # Reusable workflow for building OpenWrt firmware
 name: OpenWrt-Matrix
+run-name: OpenWrt Matrix · ${{ inputs.targets || 'all-targets' }} · ${{ github.ref_name }}
 
 on:
   workflow_call:
@@ -20,7 +21,7 @@ on:
   workflow_dispatch:
     inputs:
       targets:
-        description: "Select target platforms (comma separated, e.g. R2C,R2S,R3S,R4S,X86 ;leave blank for all, case-insensitive)"
+        description: "Select targets (comma separated, e.g. BPI-R4,BPI-R4-PRO; leave blank for all, case-insensitive)"
         required: false
         type: string
         default: ""
@@ -34,6 +35,13 @@ on:
         required: false
         type: boolean
         default: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: openwrt-matrix-${{ github.ref }}-${{ inputs.targets || 'all' }}
+  cancel-in-progress: false
 
 jobs:
   setup:
@@ -158,7 +166,7 @@ jobs:
           remove-codeql: "true"
 
       - name: Checkout
-        uses: actions/checkout@main
+        uses: actions/checkout@v4
 
       - name: Init build dependencies
         env:
@@ -224,7 +232,7 @@ jobs:
             TARGET_DEVICE_ARCH="$TARGET_DEVICE_ARCH-${{ matrix.arch_suffix }}"
           fi
           echo "TARGET_DEVICE_ARCH=$TARGET_DEVICE_ARCH" >> $GITHUB_ENV
-          latest_release="$(curl -s https://github.com/openwrt/openwrt/tags | grep -Eo "v[0-9\.]+\-*r*c*[0-9]*.tar.gz" | sed -n '/[2-9][4-9]/p' | sed -n 1p | sed 's/.tar.gz//g' | sed 's/v//g')"
+          latest_release="$(curl -s https://github.com/openwrt/openwrt/tags | grep -Eo "v[0-9\.]+\-*r*c*[0-9]*.tar.gz" | grep 'v24.10' | sed -n 1p | sed 's/.tar.gz//g' | sed 's/v//g')"
           echo "latest_release=${latest_release}" >> $GITHUB_ENV
 
           echo "Package folder ${{ env.openwrt_source_name }}"
@@ -305,11 +313,12 @@ jobs:
         with:
           name: OpenWRT-${{ env.latest_release }}
           allowUpdates: true
-          prerelease: false
+          prerelease: ${{ contains(env.latest_release, 'rc') }}
           tag: ${{ env.latest_release }}
           commit: "24.10"
           replacesArtifacts: true
           token: ${{ secrets.GITHUB_TOKEN }}
+          generateReleaseNotes: true
           artifacts: ./artifact/*.zip
 
       - name: Print Disk Space After

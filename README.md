@@ -184,6 +184,12 @@ make -j"$(nproc)"
 
 可通过 GitHub Actions 手动触发构建。
 
+对于 `BPI-R4`，发布产物应按介质拆分为：
+
+- `sd` 构建包
+- `emmc` 构建包
+- `snand` 构建包
+
 ---
 
 ## 🛠️ 使用建议

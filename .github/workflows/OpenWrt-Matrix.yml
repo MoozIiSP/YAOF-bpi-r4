@@ -295,15 +295,46 @@ jobs:
         run: |
           rm -rf ./artifact/
           mkdir -p ./artifact/
-          mv openwrt/bin/targets/${{ matrix.arch }}/${{ env.sysupgrade_glob }} ./artifact/ || true
+          cp -a openwrt/bin/targets/${{ matrix.arch }}/. ./artifact/ || true
           cd ./artifact/
           ls -Ahl
-          gzip -d *.gz && exit 0
-          gzip --best *.img
-          ls -Ahl
-          sha256sum openwrt*${{ env.sha_match }}* | tee ${{ env.artifact_prefix }}-$(date +%Y-%m-%d)-${{ env.latest_release }}.sha256sum
-          zip ${{ env.artifact_prefix }}-$(date +%Y-%m-%d)-${{ env.latest_release }}-ext4.zip ${{ env.ext4_zip }}
-          zip ${{ env.artifact_prefix }}-$(date +%Y-%m-%d)-${{ env.latest_release }}-sfs.zip ${{ env.sfs_zip }}
+          gzip -d *.gz || true
+          gzip --best *.img || true
+          BUILD_DATE=$(date +%Y-%m-%d)
+
+          if [ "${{ matrix.name }}" = "BPI-R4" ]; then
+            shopt -s nullglob
+            COMMON_FILES=(
+              openwrt-mediatek-filogic-bananapi_bpi-r4-squashfs-sysupgrade.itb
+              openwrt-mediatek-filogic-bananapi_bpi-r4.manifest
+            )
+            SD_FILES=(
+              openwrt-mediatek-filogic-bananapi_bpi-r4-sdcard.img.gz
+              "${COMMON_FILES[@]}"
+            )
+            EMMC_FILES=(
+              openwrt-mediatek-filogic-bananapi_bpi-r4-emmc-preloader.bin
+              openwrt-mediatek-filogic-bananapi_bpi-r4-emmc-bl31-uboot.fip
+              "${COMMON_FILES[@]}"
+            )
+            SNAND_FILES=(
+              openwrt-mediatek-filogic-bananapi_bpi-r4-snand-preloader.bin
+              openwrt-mediatek-filogic-bananapi_bpi-r4-snand-bl31-uboot.fip
+              "${COMMON_FILES[@]}"
+            )
+
+            sha256sum openwrt-mediatek-filogic-bananapi_bpi-r4* \
+              | tee YAOF-BPI-R4-${BUILD_DATE}-${{ env.latest_release }}.sha256sum
+
+            zip YAOF-BPI-R4-${BUILD_DATE}-${{ env.latest_release }}-sd.zip "${SD_FILES[@]}"
+            zip YAOF-BPI-R4-${BUILD_DATE}-${{ env.latest_release }}-emmc.zip "${EMMC_FILES[@]}"
+            zip YAOF-BPI-R4-${BUILD_DATE}-${{ env.latest_release }}-snand.zip "${SNAND_FILES[@]}"
+          else
+            sha256sum openwrt*${{ env.sha_match }}* | tee ${{ env.artifact_prefix }}-${BUILD_DATE}-${{ env.latest_release }}.sha256sum
+            zip ${{ env.artifact_prefix }}-${BUILD_DATE}-${{ env.latest_release }}-ext4.zip ${{ env.ext4_zip }}
+            zip ${{ env.artifact_prefix }}-${BUILD_DATE}-${{ env.latest_release }}-sfs.zip ${{ env.sfs_zip }}
+          fi
+
           ls -Ahl
 
       - name: Create release
@@ -319,7 +350,9 @@ jobs:
           replacesArtifacts: true
           token: ${{ secrets.GITHUB_TOKEN }}
           generateReleaseNotes: true
-          artifacts: ./artifact/*.zip
+          artifacts: |
+            ./artifact/*.zip
+            ./artifact/*.sha256sum
 
       - name: Print Disk Space After
         run: df -h

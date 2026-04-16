@@ -54,6 +54,13 @@ This repo should treat **SPI-NAND**, **eMMC**, and **SD** as different boot medi
 - Keep slot sizes fixed
 - Reserve the final `data` partition for **first-boot auto expansion** to the full card size
 
+### Expected build outputs
+- `...-sd.zip`
+- `...-emmc.zip`
+- `...-snand.zip`
+
+The SD image should remain A/B-capable while expanding the final `data` partition on first boot.
+
 ## 4. GPT files in this repo
 
 ### Block-device GPTs

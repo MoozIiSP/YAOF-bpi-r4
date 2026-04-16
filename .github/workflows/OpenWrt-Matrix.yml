@@ -21,7 +21,7 @@ on:
   workflow_dispatch:
     inputs:
       targets:
-        description: "Select targets (comma separated, e.g. BPI-R4,BPI-R4-PRO; leave blank for all, case-insensitive)"
+        description: "Select targets (comma separated, e.g. BPI-R4-EMMC,BPI-R4-SD,BPI-R4-SNAND,BPI-R4-PRO; leave blank for all, case-insensitive)"
         required: false
         type: string
         default: ""
@@ -53,8 +53,10 @@ jobs:
         run: |
           # All possible targets
           all_targets='[
-            {"name": "BPI-R4", "script_dir": "BPI-R4", "arch": "mediatek/filogic", "arch_suffix": "mt7988"},
-            {"name": "BPI-R4-PRO", "script_dir": "BPI-R4-PRO", "arch": "mediatek/filogic", "arch_suffix": "mt7988"}
+            {"name": "BPI-R4-EMMC", "script_dir": "BPI-R4", "seed": "BPI-R4", "arch": "mediatek/filogic", "arch_suffix": "mt7988", "bundle_kind": "emmc", "base_name": "BPI-R4", "gpt_layout": "bpi-r4-emmc-8g-ab.json"},
+            {"name": "BPI-R4-SD", "script_dir": "BPI-R4", "seed": "BPI-R4", "arch": "mediatek/filogic", "arch_suffix": "mt7988", "bundle_kind": "sd", "base_name": "BPI-R4", "gpt_layout": "bpi-r4-sd-ab.json"},
+            {"name": "BPI-R4-SNAND", "script_dir": "BPI-R4", "seed": "BPI-R4-NAND", "arch": "mediatek/filogic", "arch_suffix": "mt7988", "bundle_kind": "snand", "base_name": "BPI-R4", "gpt_layout": ""},
+            {"name": "BPI-R4-PRO", "script_dir": "BPI-R4-PRO", "seed": "BPI-R4-PRO", "arch": "mediatek/filogic", "arch_suffix": "mt7988", "bundle_kind": "generic", "base_name": "BPI-R4-PRO", "gpt_layout": ""}
           ]'
 
           # User selected targets
@@ -85,6 +87,9 @@ jobs:
       openwrt_source_name: dummy
       TARGET_DEVICE_ARCH: dummy
       latest_release: dummy
+      bundle_kind: dummy
+      base_name: dummy
+      gpt_layout: dummy
 
     runs-on: ubuntu-24.04
     if: github.event.repository.owner.id == github.event.sender.id
@@ -101,18 +106,26 @@ jobs:
           echo "inputs.build_firmware: '${{ inputs.build_firmware }}'"
           echo "matrix.name: '${{ matrix.name }}'"
           echo "matrix.script_dir: '${{ matrix.script_dir }}'"
+          echo "matrix.seed: '${{ matrix.seed }}'"
           echo "matrix.arch: '${{ matrix.arch }}'"
           echo "matrix.arch_suffix: '${{ matrix.arch_suffix }}'"
+          echo "matrix.bundle_kind: '${{ matrix.bundle_kind }}'"
+          echo "matrix.base_name: '${{ matrix.base_name }}'"
+          echo "matrix.gpt_layout: '${{ matrix.gpt_layout }}'"
           echo "github.run_id: '${{ github.run_id }}'"
 
           # Platform name in lowercase
           name_lower=$(echo "${{ matrix.name }}" | tr 'A-Z' 'a-z')
 
           # seed rule
-          seed="${{ matrix.name }}"
+          seed="${{ matrix.seed }}"
 
           # artifact_prefix rule
           artifact_prefix="YAOF-${{ matrix.name }}"
+
+          bundle_kind="${{ matrix.bundle_kind }}"
+          base_name="${{ matrix.base_name }}"
+          gpt_layout="${{ matrix.gpt_layout }}"
 
           # sha_match rule
           sha_match="$name_lower"
@@ -146,6 +159,9 @@ jobs:
           sfs_zip=$sfs_zip
           sysupgrade_glob=$sysupgrade_glob
           openwrt_source_name=$openwrt_source_name
+          bundle_kind=$bundle_kind
+          base_name=$base_name
+          gpt_layout=$gpt_layout
           EOF
 
       - name: Show system info
@@ -302,33 +318,38 @@ jobs:
           gzip --best *.img || true
           BUILD_DATE=$(date +%Y-%m-%d)
 
-          if [ "${{ matrix.name }}" = "BPI-R4" ]; then
+          if [ "${{ env.base_name }}" = "BPI-R4" ]; then
             shopt -s nullglob
             COMMON_FILES=(
               openwrt-mediatek-filogic-bananapi_bpi-r4-squashfs-sysupgrade.itb
               openwrt-mediatek-filogic-bananapi_bpi-r4.manifest
             )
-            SD_FILES=(
-              openwrt-mediatek-filogic-bananapi_bpi-r4-sdcard.img.gz
-              "${COMMON_FILES[@]}"
-            )
-            EMMC_FILES=(
-              openwrt-mediatek-filogic-bananapi_bpi-r4-emmc-preloader.bin
-              openwrt-mediatek-filogic-bananapi_bpi-r4-emmc-bl31-uboot.fip
-              "${COMMON_FILES[@]}"
-            )
-            SNAND_FILES=(
-              openwrt-mediatek-filogic-bananapi_bpi-r4-snand-preloader.bin
-              openwrt-mediatek-filogic-bananapi_bpi-r4-snand-bl31-uboot.fip
-              "${COMMON_FILES[@]}"
-            )
+
+            if [ "${{ env.bundle_kind }}" = "sd" ]; then
+              BUNDLE_FILES=(
+                openwrt-mediatek-filogic-bananapi_bpi-r4-sdcard.img.gz
+                "${COMMON_FILES[@]}"
+              )
+            elif [ "${{ env.bundle_kind }}" = "emmc" ]; then
+              BUNDLE_FILES=(
+                openwrt-mediatek-filogic-bananapi_bpi-r4-emmc-preloader.bin
+                openwrt-mediatek-filogic-bananapi_bpi-r4-emmc-bl31-uboot.fip
+                "${COMMON_FILES[@]}"
+              )
+            elif [ "${{ env.bundle_kind }}" = "snand" ]; then
+              BUNDLE_FILES=(
+                openwrt-mediatek-filogic-bananapi_bpi-r4-snand-preloader.bin
+                openwrt-mediatek-filogic-bananapi_bpi-r4-snand-bl31-uboot.fip
+                "${COMMON_FILES[@]}"
+              )
+            else
+              BUNDLE_FILES=(openwrt-mediatek-filogic-bananapi_bpi-r4*)
+            fi
 
             sha256sum openwrt-mediatek-filogic-bananapi_bpi-r4* \
-              | tee YAOF-BPI-R4-${BUILD_DATE}-${{ env.latest_release }}.sha256sum
+              | tee YAOF-${{ matrix.name }}-${BUILD_DATE}-${{ env.latest_release }}.sha256sum
 
-            zip YAOF-BPI-R4-${BUILD_DATE}-${{ env.latest_release }}-sd.zip "${SD_FILES[@]}"
-            zip YAOF-BPI-R4-${BUILD_DATE}-${{ env.latest_release }}-emmc.zip "${EMMC_FILES[@]}"
-            zip YAOF-BPI-R4-${BUILD_DATE}-${{ env.latest_release }}-snand.zip "${SNAND_FILES[@]}"
+            zip YAOF-${{ matrix.name }}-${BUILD_DATE}-${{ env.latest_release }}.zip "${BUNDLE_FILES[@]}"
           else
             sha256sum openwrt*${{ env.sha_match }}* | tee ${{ env.artifact_prefix }}-${BUILD_DATE}-${{ env.latest_release }}.sha256sum
             zip ${{ env.artifact_prefix }}-${BUILD_DATE}-${{ env.latest_release }}-ext4.zip ${{ env.ext4_zip }}

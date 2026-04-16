@@ -85,11 +85,15 @@
     85|    echo "[BOOT] Replaced U-Boot with bl-mt798x-dhcpd version"
     86|  fi
     87|  
-  # 3. Inject media-specific GPT definitions for A/B testing on block devices
-  if [ -d "../PATCH/gpt" ]; then
+  # 3. Inject media-specific GPT definitions for block-device targets when requested
+  if [ -n "$BPI_R4_GPT_LAYOUT" ] && [ -f "../PATCH/gpt/$BPI_R4_GPT_LAYOUT" ]; then
     mkdir -p ./package/boot/arm-trusted-firmware-mediatek/src/gpt
-    cp ../PATCH/gpt/*.json ./package/boot/arm-trusted-firmware-mediatek/src/gpt/ 2>/dev/null || true
-    echo "[GPT] Injected media-specific GPT layouts from PATCH/gpt"
+    cp "../PATCH/gpt/$BPI_R4_GPT_LAYOUT" ./package/boot/arm-trusted-firmware-mediatek/src/gpt/
+    echo "[GPT] Injected GPT layout: $BPI_R4_GPT_LAYOUT"
+  elif [ -n "$BPI_R4_GPT_LAYOUT" ]; then
+    echo "[GPT] Requested GPT layout '$BPI_R4_GPT_LAYOUT' not found, skipping"
+  else
+    echo "[GPT] No block-device GPT layout requested (expected for NAND / non-GPT targets)"
   fi
 
   else

@@ -29,7 +29,7 @@ jobs:
     uses: ./.github/workflows/OpenWrt-Matrix.yml
     if: github.event.repository.owner.id == github.event.sender.id && inputs.badge_status == ''
     with:
-      targets: "BPI-R4"
+      targets: "BPI-R4-EMMC,BPI-R4-SD,BPI-R4-SNAND"
       upload_source: ${{ github.event_name == 'workflow_dispatch' && inputs.upload_source }}
       build_firmware: ${{ (github.event_name == 'workflow_dispatch' && inputs.build_firmware) || github.event_name != 'workflow_dispatch' }}
 

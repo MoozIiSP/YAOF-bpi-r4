@@ -23,6 +23,11 @@ This repo should treat **SPI-NAND**, **eMMC**, and **SD** as different boot medi
 - NAND layout is boot-medium specific (typically NMBM or full UBI style)
 - Keep rootfs lean; extra plugins should live on overlay only if space allows, or preferably on eMMC/SD/external storage
 
+### Current build policy
+- Use `SEED/BPI-R4-NAND/config.seed` for the SPI-NAND bundle
+- Keep NAND image bootable with U-Boot / FIP / kernel / rootfs
+- Treat SPI-NAND as a **minimal main system / recovery system**, not the full plugin-heavy profile
+
 ## 2. eMMC (officially common 8GB)
 
 ### Goal
@@ -55,9 +60,9 @@ This repo should treat **SPI-NAND**, **eMMC**, and **SD** as different boot medi
 - Reserve the final `data` partition for **first-boot auto expansion** to the full card size
 
 ### Expected build outputs
-- `...-sd.zip`
-- `...-emmc.zip`
-- `...-snand.zip`
+- `YAOF-BPI-R4-SD-*.zip`
+- `YAOF-BPI-R4-EMMC-*.zip`
+- `YAOF-BPI-R4-SNAND-*.zip`
 
 The SD image should remain A/B-capable while expanding the final `data` partition on first boot.
 
@@ -75,8 +80,14 @@ The SD image should remain A/B-capable while expanding the final `data` partitio
 ### Important
 These GPT files are for **block devices** (eMMC / SD). They are **not** the NAND partition definition.
 
-## 5. Immediate follow-up work
+## 5. Current status / next follow-up work
 
-1. Wire media-specific image generation more explicitly (eMMC vs SD)
-2. Add first-boot auto-expand logic for SD `data`
-3. Define NAND-specific boot / partition handling separately from GPT-based media
+Already implemented in repo:
+1. Media-specific BPI-R4 build targets (`BPI-R4-EMMC`, `BPI-R4-SD`, `BPI-R4-SNAND`)
+2. SD first-boot auto-expand logic for the final `data` partition
+3. NAND-specific minimal seed profile (`SEED/BPI-R4-NAND/config.seed`)
+
+Still worth refining later:
+1. Make NAND image constraints even more explicit in package selection and release notes
+2. Verify bootloader / partition behavior on real hardware for each medium
+3. Decide whether SD and eMMC should diverge further in GPT sizing after field testing

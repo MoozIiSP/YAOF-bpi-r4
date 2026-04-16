@@ -129,6 +129,7 @@ BPI-R4 典型关注点包括：
 │   └── BPI-R4/02_target_only.sh
 ├── SEED/                   # 目标机型 seed 配置
 │   ├── BPI-R4/config.seed
+│   ├── BPI-R4-NAND/config.seed
 │   └── BPI-R4-PRO/config.seed
 ├── .github/workflows/      # GitHub Actions
 ├── docs/                   # 介质策略、布局说明
@@ -137,6 +138,7 @@ BPI-R4 典型关注点包括：
 其中：
 
 - `SEED/BPI-R4/config.seed` 是当前主力配置
+- `SEED/BPI-R4-NAND/config.seed` 是 SPI-NAND 最小可启动系统配置
 - `SCRIPTS/BPI-R4/02_target_only.sh` 包含 BPI-R4 定向处理
 - `BPI-R4-PRO` 工作流已存在，但是否完整可用请以当前分支内容与发布结果为准
 - `docs/bpi-r4-storage-layout.md` 记录 NAND / eMMC / SD 的介质分工与分区策略
@@ -184,11 +186,17 @@ make -j"$(nproc)"
 
 可通过 GitHub Actions 手动触发构建。
 
-对于 `BPI-R4`，发布产物应按介质拆分为：
+对于 `BPI-R4`，流水线会分别产出：
 
-- `sd` 构建包
-- `emmc` 构建包
-- `snand` 构建包
+- `BPI-R4-SD`
+- `BPI-R4-EMMC`
+- `BPI-R4-SNAND`
+
+其中：
+
+- `BPI-R4-SD`：A/B 测试镜像，首启自动扩最后的 `data` 分区
+- `BPI-R4-EMMC`：8GB-safe 的主力 eMMC A/B 布局
+- `BPI-R4-SNAND`：最小可启动 NAND 系统，强调 boot / recovery / overlay
 
 ---
 

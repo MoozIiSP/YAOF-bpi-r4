@@ -172,6 +172,17 @@ cat /sys/class/block/mmcblk0/device/type
 ls -l /etc/.sd-data-expanded
 ```
 
+To capture a reusable evidence pack on-device, run:
+
+```sh
+sh tools/collect_bpi_r4_runtime_report.sh ./bpi-r4-validation-report
+```
+
+Then copy the result into a release/test report based on:
+
+- `docs/bpi-r4-test-report-template.md`
+- `docs/bpi-r4-release-notes-template.md`
+
 ---
 
 ## 6. Recommended pass criteria

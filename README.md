@@ -132,7 +132,9 @@ BPI-R4 典型关注点包括：
 │   ├── BPI-R4-NAND/config.seed
 │   └── BPI-R4-PRO/config.seed
 ├── .github/workflows/      # GitHub Actions
-├── docs/                   # 介质策略、布局说明
+├── docs/                   # 介质策略、验证模板、发布说明模板
+├── tests/                  # 仓库级验证测试
+└── tools/                  # 介质布局 / 发布产物验证工具
 ```
 
 其中：
@@ -140,9 +142,14 @@ BPI-R4 典型关注点包括：
 - `SEED/BPI-R4/config.seed` 是当前主力配置
 - `SEED/BPI-R4-NAND/config.seed` 是 SPI-NAND 最小可启动系统配置
 - `SCRIPTS/BPI-R4/02_target_only.sh` 包含 BPI-R4 定向处理
-- `BPI-R4-PRO` 工作流已存在，但是否完整可用请以当前分支内容与发布结果为准
 - `docs/bpi-r4-storage-layout.md` 记录 NAND / eMMC / SD 的介质分工与分区策略
 - `docs/bpi-r4-validation-checklist.md` 提供 SD / eMMC / SPI-NAND 的上板验证清单
+- `docs/bpi-r4-test-report-template.md` 提供真实硬件验证结果沉淀模板
+- `docs/bpi-r4-release-notes-template.md` 约束每次 release 的刷写 / 回退 / 已知问题说明
+- `docs/bpi-r4-pro-status.md` 明确 `BPI-R4-PRO` 当前仍为实验性状态
+- `tools/validate_bpi_r4_bundles.py` 校验 SD / eMMC / SPI-NAND 发布包内容
+- `tools/validate_bpi_r4_layouts.py` 校验 eMMC/SD GPT 布局与 8GB-safe 边界
+- `tools/collect_bpi_r4_runtime_report.sh` 用于上板后采集运行证据
 
 ---
 
@@ -203,6 +210,42 @@ make -j"$(nproc)"
 
 - `docs/bpi-r4-storage-layout.md`
 - `docs/bpi-r4-validation-checklist.md`
+- `docs/bpi-r4-test-report-template.md`
+- `docs/bpi-r4-release-notes-template.md`
+
+CI 会在发布前额外执行：
+
+- `tools/validate_bpi_r4_layouts.py`
+- `tools/validate_bpi_r4_bundles.py`
+- `tests/test_validate_bpi_r4_layouts.py`
+- `tests/test_validate_bpi_r4_bundles.py`
+
+并把 JSON 验证结果一并附加到 release artifacts，便于核对布局、打包和发布说明是否一致。
+
+---
+
+## 📝 发布与验证流程
+
+推荐每次 tag 都遵循下面这套闭环：
+
+1. CI 产出 `SD / EMMC / SNAND` 三套 bundle
+2. CI 生成 `bundle/layout` 两份 JSON 验证报告
+3. 发布说明按 `docs/bpi-r4-release-notes-template.md` 填充
+4. 真机验证结果按 `docs/bpi-r4-test-report-template.md` 沉淀
+5. 上板后在设备上执行：
+
+```sh
+sh tools/collect_bpi_r4_runtime_report.sh ./bpi-r4-validation-report
+```
+
+把采集结果附到对应 release / test report。
+
+---
+
+## 🧪 支持状态
+
+- `BPI-R4`：主维护目标，要求介质级验证闭环
+- `BPI-R4-PRO`：当前仍为**实验性**，详见 `docs/bpi-r4-pro-status.md`
 
 ---
 
@@ -234,13 +277,14 @@ make -j"$(nproc)"
 
 ---
 
-## 📝 后续建议
+## 📝 当前已补齐的维护配套
 
-如果你要继续把仓库往“更像一个可长期维护的固件项目”推进，优先建议做这几件事：
+当前仓库已经补齐这些以前悬空的事项：
 
-1. 给仓库补上 GitHub Topics：`bpi-r4`, `openwrt`, `mt7988`, `filogic`, `wifi7`
-2. 给每个正式 tag 补 Release Notes
-3. 在发布页注明：适用机型、刷写方式、已知问题、回退方式
-4. 后续如果 `BPI-R4-PRO` 真开始维护，再把 README 里的支持矩阵单独展开
+1. GitHub Topics 已配置：`bananapi`, `bpi-r4`, `filogic`, `mediatek`, `mt7988`, `openwrt`, `router-firmware`, `wifi7`
+2. Release 说明模板已补：`docs/bpi-r4-release-notes-template.md`
+3. 真机测试报告模板已补：`docs/bpi-r4-test-report-template.md`
+4. CI 已补发布前校验：bundle 内容 + GPT 布局 + 8GB-safe 边界
+5. `BPI-R4-PRO` 状态已单独标记为实验性，避免误判为已完成维护
 
 <p align="center"><strong>为 BPI-R4 做定向优化，而不是做一份什么都想兼顾的固件。</strong></p>

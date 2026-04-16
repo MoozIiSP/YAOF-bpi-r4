@@ -358,6 +358,17 @@ jobs:
 
           ls -Ahl
 
+      - name: Validate BPI-R4 release artifacts
+        if: inputs.build_firmware && matrix.base_name == 'BPI-R4'
+        run: |
+          python3 -m unittest \
+            tests/test_validate_bpi_r4_bundles.py \
+            tests/test_validate_bpi_r4_layouts.py
+          bundle_path=$(find ./artifact -maxdepth 1 -name "YAOF-${{ matrix.name }}-*.zip" | head -n 1)
+          test -n "$bundle_path"
+          python3 tools/validate_bpi_r4_layouts.py --json > ./artifact/YAOF-BPI-R4-layout-validation-${{ env.latest_release }}.json
+          python3 tools/validate_bpi_r4_bundles.py "$bundle_path" --json > ./artifact/YAOF-BPI-R4-bundle-validation-${{ matrix.name }}-${{ env.latest_release }}.json
+
       - name: Create release
         if: inputs.build_firmware
         id: create_release
@@ -374,6 +385,7 @@ jobs:
           artifacts: |
             ./artifact/*.zip
             ./artifact/*.sha256sum
+            ./artifact/*.json
 
       - name: Print Disk Space After
         run: df -h

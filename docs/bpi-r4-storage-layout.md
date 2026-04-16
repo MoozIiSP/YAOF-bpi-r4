@@ -86,11 +86,13 @@ Already implemented in repo:
 1. Media-specific BPI-R4 build targets (`BPI-R4-EMMC`, `BPI-R4-SD`, `BPI-R4-SNAND`)
 2. SD first-boot auto-expand logic for the final `data` partition
 3. NAND-specific minimal seed profile (`SEED/BPI-R4-NAND/config.seed`)
+4. CI bundle/layout validators plus release/test report templates
+5. Explicit `BPI-R4-PRO` experimental-status note
 
 Still worth refining later:
-1. Make NAND image constraints even more explicit in package selection and release notes
-2. Verify bootloader / partition behavior on real hardware for each medium
-3. Decide whether SD and eMMC should diverge further in GPT sizing after field testing
+1. Execute the real hardware validation run and publish `docs/bpi-r4-test-report-<tag>.md`
+2. Decide whether SD and eMMC should diverge further in GPT sizing after field testing
+3. Promote `BPI-R4-PRO` only after dedicated hardware validation
 
 ## 6. Validation checklist
 

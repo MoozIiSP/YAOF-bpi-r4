@@ -270,14 +270,6 @@ jobs:
             ${{ env.openwrt_source_name }}
           retention-days: 5
 
-      - name: Cache
-        if: inputs.build_firmware
-        uses: HiGarfield/cachewrtbuild@main
-        with:
-          mixkey: ${{ env.TARGET_DEVICE_ARCH }}
-          prefix: ${{ github.workspace }}/openwrt
-          skip_saving: ${{ !inputs.build_firmware }}
-
       - name: Make Download
         if: inputs.build_firmware
         working-directory: ${{ github.workspace }}/openwrt

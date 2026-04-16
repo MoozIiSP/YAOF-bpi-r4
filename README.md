@@ -1,57 +1,226 @@
 <p align="center">
-<img width="768" src="https://raw.githubusercontent.com/QiuSimons/Others/master/YAOF.png" >
+  <img width="768" src="https://raw.githubusercontent.com/QiuSimons/Others/master/YAOF.png" alt="YAOF">
 </p>
+
 <p align="center">
-<img src="https://github.com/Tired-Fox/cargors/raw/aabd34c/assets/badges/built_with_love.svg">
-<p>
-<p align="center">
-<img alt="GitHub All Releases" src="https://img.shields.io/github/downloads/QiuSimons/YAOF/total?style=for-the-badge">
-<img alt="GitHub" src="https://img.shields.io/github/license/QiuSimons/YAOF?style=for-the-badge">
-<p>
-<p align="center">
-<img src="https://github.com/QiuSimons/YAOF/workflows/R2C-OpenWrt/badge.svg">
-<img src="https://github.com/QiuSimons/YAOF/workflows/R2S-OpenWrt/badge.svg">
-<img src="https://github.com/QiuSimons/YAOF/workflows/R4S-OpenWrt/badge.svg">
-<img src="https://github.com/QiuSimons/YAOF/workflows/X86-OpenWrt/badge.svg">
-<p>
+  <a href="https://github.com/MoozIiSP/YAOF-bpi-r4/releases">
+    <img alt="Latest Release" src="https://img.shields.io/github/v/release/MoozIiSP/YAOF-bpi-r4?style=for-the-badge&label=Release">
+  </a>
+  <a href="https://github.com/MoozIiSP/YAOF-bpi-r4/blob/24.10/LICENSE">
+    <img alt="License" src="https://img.shields.io/github/license/MoozIiSP/YAOF-bpi-r4?style=for-the-badge">
+  </a>
+  <a href="https://github.com/MoozIiSP/YAOF-bpi-r4/actions/workflows/BPI-R4-OpenWrt.yml">
+    <img alt="BPI-R4 Build" src="https://img.shields.io/github/actions/workflow/status/MoozIiSP/YAOF-bpi-r4/BPI-R4-OpenWrt.yml?branch=24.10&style=for-the-badge&label=BPI-R4">
+  </a>
+  <a href="https://github.com/MoozIiSP/YAOF-bpi-r4/actions/workflows/BPI-R4-PRO-OpenWrt.yml">
+    <img alt="BPI-R4-PRO Build" src="https://img.shields.io/github/actions/workflow/status/MoozIiSP/YAOF-bpi-r4/BPI-R4-PRO-OpenWrt.yml?branch=24.10&style=for-the-badge&label=BPI-R4-PRO">
+  </a>
+</p>
 
+<h1 align="center">YAOF for Banana Pi BPI-R4</h1>
+<p align="center"><strong>OpenWrt 24.10 · MT7988 / Filogic 880 · WiFi 7 · 10G · VPN-friendly</strong></p>
 
-<h1 align="center">请勿用于商业用途!!!</h1>
+> 本仓库是面向 **Banana Pi BPI-R4** 的 YAOF 分支，聚焦 **OpenWrt 24.10 + Kernel 6.6**，优先保证 MTK WiFi / 交换 / 10G 相关稳定性。
 
-### 特性
+---
 
-- 基于原生 OpenWrt 24.10 编译，默认管理地址 192.168.1.1
-- 默认开启了 SFE（修正了 udp 入站以及 sqm 兼容性问题）
-- 内置升级功能可用，物理 Reset 按键可用
-- 预配置了部分插件<b>(注意，使用 MosDNS 同时作为广告过滤手段及 dns 分流措施。)</b>
-- 可无脑 opkg kmod
-- R2C/R2S 核心频率 1.6（交换了 LAN WAN），R4S 核心频率 2.2/1.8（建议使用带有线损补偿的电源，死机大多数情况下，都是因为<b>你用的电源过于垃圾</b>，另外，你也可以选择使用<b>自带的 app 限制最大频率</b>，茄子 🍆）
-- O2 编译，CFLAG 优化
-- 插件包含：SSRP，PassWall，OpenClash，Mihomo，DAED，微信推送，网易云解锁，SQM，DNSProxy，网络唤醒，DDNS，迅雷快鸟，UPNP，FullCone(防火墙中开启，默认开启)，流量分载，irq 优化，京东签到，Zerotier，FRPC，FRPS，无线打印，流量监控，过滤军刀，R2S-OLED
-- ss 协议在 armv8 上实现了 aes 硬件加速（请<b>仅使用 aead 加密</b>的连接方式）
-- 集成并默认启用了 BBRv3，LRNG
-- 不再集成了 Docker，Docker刚需用户请停留在23.05，要使用 Docker，请先开启“Docker-配置-自动启动”选项，并保存应用设置
-- 内置了一个一键格式化剩余空间并挂载的插件，方便 Docker 用户
-- 如有任何问题，请先尝试 ssh 进入后台，输入 fuck 后回车，等待机器重启后确认问题是否已经解决
+## ⚠️ 声明
 
-### 下载
+- **请勿用于商业用途**。
+- 本仓库衍生于 [QiuSimons/YAOF](https://github.com/QiuSimons/YAOF)，感谢原作者与 OpenWrt / ImmortalWrt / 社区维护者的工作。
+- 这里的取舍是 **BPI-R4 定向优化**，不是全平台通用仓库。
 
-- 选择自己<b>设备对应的固件</b>，并[下载](https://github.com/QiuSimons/R2S-R4S-OpenWrt/releases)
+---
 
-### 致敬
+## 🎯 项目定位
 
-本仓库衍生于 [QiuSimons/YAOF](https://github.com/QiuSimons/YAOF)，感谢原作者的付出。
+这个仓库当前主要服务于以下目标：
 
-### 鸣谢
+- **设备**：Banana Pi **BPI-R4**
+- **分支路线**：`24.10` / `mt7988-24.10`
+- **内核策略**：锁定 **6.6**，优先 MTK 驱动稳定性，不盲目追新内核
+- **网络场景**：WiFi 7、10G SFP+、多 WAN、VPN、旁路/分流、家宽路由强化
+- **构建方式**：GitHub Actions + GitLab CI 双轨
 
-|               [ImmortalWrt](https://github.com/immortalwrt)               |              [coolsnowwolf](https://github.com/coolsnowwolf)              |                    [Lienol](https://github.com/Lienol)                    |
-| :-----------------------------------------------------------------------: | :-----------------------------------------------------------------------: | :-----------------------------------------------------------------------: |
-| <img width="60" src="https://avatars.githubusercontent.com/u/53193414"/>  | <img width="60" src="https://avatars.githubusercontent.com/u/31687149" /> | <img width="60" src="https://avatars.githubusercontent.com/u/23146169" /> |
-|            [NoTengoBattery](https://github.com/NoTengoBattery)            |                    [tty228](https://github.com/tty228)                    |                  [destan19](https://github.com/destan19)                  |
-| <img width="60" src="https://avatars.githubusercontent.com/u/11285513" /> | <img width="60" src="https://avatars.githubusercontent.com/u/33397881" /> | <img width="60" src="https://avatars.githubusercontent.com/u/3950091" />  |
-|                 [jerrykuku](https://github.com/jerrykuku)                 |                    [lisaac](https://github.com/lisaac)                    |             [rufengsuixing](https://github.com/rufengsuixing)             |
-| <img width="60" src="https://avatars.githubusercontent.com/u/9485680" />  | <img width="60" src="https://avatars.githubusercontent.com/u/3320969" />  | <img width="60" src="https://avatars.githubusercontent.com/u/22387141" /> |
-|                     [ElonH](https://github.com/ElonH)                     |                   [NateLol](https://github.com/NateLol)                   |                   [kiddin9](https://github.com/kiddin9)                   |
-| <img width="60" src="https://avatars.githubusercontent.com/u/32666230" /> | <img width="60" src="https://avatars.githubusercontent.com/u/5166306" />  | <img width="60" src="https://avatars.githubusercontent.com/u/48883331" /> |
-|              [AmadeusGhost](https://github.com/AmadeusGhost)              |                [1715173329](https://github.com/1715173329)                |                 [vernesong](https://github.com/vernesong)                 |
-| <img width="60" src="https://avatars.githubusercontent.com/u/42570690" /> | <img width="60" src="https://avatars.githubusercontent.com/u/22235437" /> | <img width="60" src="https://avatars.githubusercontent.com/u/42875168" /> |
+如果你在找的是 R2S / R4S / x86 的通用版本，这里不是那个仓库；这里已经明显偏向 **BPI-R4 专用**。
+
+---
+
+## ✨ 特性
+
+### 基础
+
+- 基于原生 **OpenWrt 24.10** 编译
+- 默认管理地址：`192.168.1.1`
+- 内置升级能力可用，物理 Reset 可用
+- 保留较强的可扩展性，适合继续装包与二次定制
+
+### 性能 / 网络
+
+- 默认启用 **SFE**，兼顾 UDP 入站与 SQM 兼容性
+- 集成 **BBRv3**、**LRNG**
+- 面向 MT7988/Filogic 880 做了定向优化
+- 对 10G / 高并发 / VPN 使用场景更友好
+
+### 常用预置
+
+- **MosDNS**（广告过滤 + DNS 分流）
+- **PassWall / OpenClash / HomeProxy / Nikki / Dae**
+- **SQM / UPNP / DDNS / Zerotier / Tailscale / FRP**
+- **Watchcat / Filemanager / Argon / 微信推送 / WOL / NATMapT**
+
+### 其他
+
+- 支持直接 `opkg` 安装大量 `kmod-*`
+- 保留 Docker 相关辅助思路，但当前主线重点不是 Docker 场景
+- 如遇奇怪问题，可 SSH 后执行：
+
+```bash
+fuck
+```
+
+等待机器重启后再确认问题是否消失。
+
+---
+
+## 🧩 硬件侧重点
+
+BPI-R4 典型关注点包括：
+
+- **MT7988A / Filogic 880**
+- **WiFi 7 / MT7996**
+- **10G SFP+**
+- **多千兆口交换 / VLAN / 路由混合场景**
+- **Cloudflare / Tailscale / ZeroTier / 代理栈**
+
+本仓库的策略更偏向：
+
+- 先把 **能稳定跑** 放在第一位
+- 再追求无线与网络吞吐
+- 最后才考虑激进升级内核/驱动
+
+---
+
+## 📦 固件下载
+
+请前往 Releases 页面下载与你设备匹配的固件：
+
+- [Releases / 发布页](https://github.com/MoozIiSP/YAOF-bpi-r4/releases)
+
+建议优先关注：
+
+- `BPI-R4`
+- `24.10.x`
+- `sysupgrade`
+- `factory`（如果某次发布有提供）
+
+> 如果某个发布同时出现多个镜像，优先按发布说明选择，不要盲刷不匹配的产物。
+
+---
+
+## 🏗️ 仓库结构
+
+```text
+.
+├── PATCH/                  # 内核/系统/网络相关补丁
+├── SCRIPTS/                # 构建脚本
+│   ├── 01_get_ready.sh
+│   ├── 02_prepare_package.sh
+│   └── BPI-R4/02_target_only.sh
+├── SEED/                   # 目标机型 seed 配置
+│   ├── BPI-R4/config.seed
+│   └── BPI-R4-PRO/config.seed
+├── .github/workflows/      # GitHub Actions
+└── .gitlab-ci.yml          # GitLab CI
+```
+
+其中：
+
+- `SEED/BPI-R4/config.seed` 是当前主力配置
+- `SCRIPTS/BPI-R4/02_target_only.sh` 包含 BPI-R4 定向处理
+- `BPI-R4-PRO` 工作流已存在，但是否完整可用请以当前分支内容与发布结果为准
+
+---
+
+## 🔨 本地构建
+
+推荐环境：
+
+- Ubuntu 24.04 / 22.04
+- 8 GB+ 内存
+- 50 GB+ 可用磁盘
+
+基础流程：
+
+```bash
+git clone -b 24.10 https://github.com/MoozIiSP/YAOF-bpi-r4.git
+cd YAOF-bpi-r4
+
+bash SCRIPTS/01_get_ready.sh
+bash SCRIPTS/02_prepare_package.sh
+bash SCRIPTS/BPI-R4/02_target_only.sh
+
+cd openwrt
+make defconfig
+make -j"$(nproc)"
+```
+
+### 构建说明
+
+- 当前路线偏向 **OpenWrt 24.10 / Kernel 6.6**
+- 不建议随手切到 6.12+ 再期待 MTK WiFi 仍然稳定
+- 如果你想继续魔改，请优先理解 `PATCH/` 与 `SEED/` 的关系
+
+---
+
+## 🚀 CI / 自动构建
+
+当前仓库已包含：
+
+- `BPI-R4-OpenWrt.yml`
+- `BPI-R4-PRO-OpenWrt.yml`
+- `OpenWrt-Matrix.yml`
+- `.gitlab-ci.yml`
+
+可通过 GitHub Actions 手动触发构建，也可以走 GitLab CI。
+
+---
+
+## 🛠️ 使用建议
+
+适合以下用户：
+
+- 已经明确自己在玩 **BPI-R4**
+- 想要一套更偏实战的 OpenWrt 固件
+- 看重 **WiFi 7 / 10G / VPN / 分流**
+- 能接受这个仓库是“面向单板定制”而不是“通用发行版”
+
+不太适合：
+
+- 需要全平台统一维护的人
+- 追求最新内核、最新驱动、最新一切的人
+- 想要完全零维护、零折腾体验的人
+
+---
+
+## 🙏 鸣谢
+
+- [QiuSimons/YAOF](https://github.com/QiuSimons/YAOF)
+- [OpenWrt](https://github.com/openwrt/openwrt)
+- [ImmortalWrt](https://github.com/immortalwrt/immortalwrt)
+- [frank-w](https://github.com/frank-w)
+- MediaTek / Filogic 相关社区维护者
+- 各类 LuCI 插件与第三方包维护者
+
+---
+
+## 📝 后续建议
+
+如果你要继续把仓库往“更像一个可长期维护的固件项目”推进，优先建议做这几件事：
+
+1. 给仓库补上 GitHub Topics：`bpi-r4`, `openwrt`, `mt7988`, `filogic`, `wifi7`
+2. 给每个正式 tag 补 Release Notes
+3. 在发布页注明：适用机型、刷写方式、已知问题、回退方式
+4. 后续如果 `BPI-R4-PRO` 真开始维护，再把 README 里的支持矩阵单独展开
+
+<p align="center"><strong>为 BPI-R4 做定向优化，而不是做一份什么都想兼顾的固件。</strong></p>

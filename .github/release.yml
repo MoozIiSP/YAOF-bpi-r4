@@ -1,0 +1,38 @@
+changelog:
+  exclude:
+    labels:
+      - skip-changelog
+      - duplicate
+      - invalid
+      - question
+  categories:
+    - title: "🚀 Features"
+      labels:
+        - feature
+        - enhancement
+        - feat
+    - title: "🐛 Fixes"
+      labels:
+        - fix
+        - bug
+        - bugfix
+    - title: "📦 Build / CI"
+      labels:
+        - ci
+        - build
+        - github-actions
+        - gitlab-ci
+    - title: "📚 Documentation"
+      labels:
+        - docs
+        - documentation
+    - title: "⚙️ Kernel / Network"
+      labels:
+        - kernel
+        - network
+        - mtk
+        - wifi
+        - performance
+    - title: "🧹 Other Changes"
+      labels:
+        - '*'

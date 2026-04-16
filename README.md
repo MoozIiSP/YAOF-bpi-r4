@@ -146,10 +146,12 @@ BPI-R4 典型关注点包括：
 - `docs/bpi-r4-validation-checklist.md` 提供 SD / eMMC / SPI-NAND 的上板验证清单
 - `docs/bpi-r4-test-report-template.md` 提供真实硬件验证结果沉淀模板
 - `docs/bpi-r4-release-notes-template.md` 约束每次 release 的刷写 / 回退 / 已知问题说明
+- `docs/bpi-r4-dev-test-loop.md` 约束从编译到烧录再到日志分析的闭环
 - `docs/bpi-r4-pro-status.md` 明确 `BPI-R4-PRO` 当前仍为实验性状态
 - `tools/validate_bpi_r4_bundles.py` 校验 SD / eMMC / SPI-NAND 发布包内容
 - `tools/validate_bpi_r4_layouts.py` 校验 eMMC/SD GPT 布局与 8GB-safe 边界
 - `tools/collect_bpi_r4_runtime_report.sh` 用于上板后采集运行证据
+- `tools/analyze_bpi_r4_runtime_report.py` 用于把采集日志归类成可行动的优化项
 
 ---
 
@@ -212,6 +214,7 @@ make -j"$(nproc)"
 - `docs/bpi-r4-validation-checklist.md`
 - `docs/bpi-r4-test-report-template.md`
 - `docs/bpi-r4-release-notes-template.md`
+- `docs/bpi-r4-dev-test-loop.md`
 
 CI 会在发布前额外执行：
 

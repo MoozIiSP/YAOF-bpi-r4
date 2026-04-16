@@ -183,6 +183,16 @@ cp -rf ../PATCH/kernel/wg/* ./target/linux/generic/hack-6.6/
 echo "net.netfilter.nf_conntrack_tcp_max_retrans=5" >>./package/kernel/linux/files/sysctl-nf-conntrack.conf
 # OTHERS
 cp -rf ../PATCH/kernel/others/* ./target/linux/generic/pending-6.6/
+rm -f ./target/linux/generic/pending-6.6/1007-wozi-arch-arm64-dts-mt7988a-add-thermal-zone.patch
+python3 - <<'PY'
+from pathlib import Path
+path = Path('./target/linux/mediatek/files-6.6/arch/arm64/boot/dts/mediatek/mt7988a.dtsi')
+text = path.read_text()
+old = '\t\t\tstatus = "disabled";\n'
+if old not in text:
+    raise SystemExit(f'mt7988a thermal status line not found in {path}')
+path.write_text(text.replace(old, '', 1))
+PY
 # 6.17_ppp_performance
 wget https://github.com/torvalds/linux/commit/95d0d094.patch -O target/linux/generic/pending-6.6/999-1-95d0d09.patch
 wget https://github.com/torvalds/linux/commit/1a3e9b7a.patch -O target/linux/generic/pending-6.6/999-2-1a3e9b7.patch

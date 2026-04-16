@@ -21,7 +21,6 @@ changelog:
         - ci
         - build
         - github-actions
-        - gitlab-ci
     - title: "📚 Documentation"
       labels:
         - docs

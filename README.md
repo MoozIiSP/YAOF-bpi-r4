@@ -40,7 +40,7 @@
 - **分支路线**：`24.10` / `mt7988-24.10`
 - **内核策略**：锁定 **6.6**，优先 MTK 驱动稳定性，不盲目追新内核
 - **网络场景**：WiFi 7、10G SFP+、多 WAN、VPN、旁路/分流、家宽路由强化
-- **构建方式**：GitHub Actions + GitLab CI 双轨
+- **构建方式**：GitHub Actions
 
 如果你在找的是 R2S / R4S / x86 的通用版本，这里不是那个仓库；这里已经明显偏向 **BPI-R4 专用**。
 
@@ -131,7 +131,6 @@ BPI-R4 典型关注点包括：
 │   ├── BPI-R4/config.seed
 │   └── BPI-R4-PRO/config.seed
 ├── .github/workflows/      # GitHub Actions
-└── .gitlab-ci.yml          # GitLab CI
 ```
 
 其中：
@@ -180,9 +179,8 @@ make -j"$(nproc)"
 - `BPI-R4-OpenWrt.yml`
 - `BPI-R4-PRO-OpenWrt.yml`
 - `OpenWrt-Matrix.yml`
-- `.gitlab-ci.yml`
 
-可通过 GitHub Actions 手动触发构建，也可以走 GitLab CI。
+可通过 GitHub Actions 手动触发构建。
 
 ---
 

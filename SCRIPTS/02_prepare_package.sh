@@ -85,15 +85,16 @@
     85|    echo "[BOOT] Replaced U-Boot with bl-mt798x-dhcpd version"
     86|  fi
     87|  
-    88|  # 3. Inject A/B Partition GPT Definition
-    89|  if [ -f "../PATCH/gpt/bpi-r4-ab.json" ]; then
-    90|    mkdir -p ./package/boot/arm-trusted-firmware-mediatek/src/gpt
-    91|    cp ../PATCH/gpt/bpi-r4-ab.json ./package/boot/arm-trusted-firmware-mediatek/src/gpt/
-    92|    echo "[GPT] Injected bpi-r4-ab.json for A/B Partition support"
-    93|  fi
-    94|else
-    95|  echo "[BOOT] Custom bootloader repo not found, using default OpenWrt sources"
-    96|fi
+  # 3. Inject media-specific GPT definitions for A/B testing on block devices
+  if [ -d "../PATCH/gpt" ]; then
+    mkdir -p ./package/boot/arm-trusted-firmware-mediatek/src/gpt
+    cp ../PATCH/gpt/*.json ./package/boot/arm-trusted-firmware-mediatek/src/gpt/ 2>/dev/null || true
+    echo "[GPT] Injected media-specific GPT layouts from PATCH/gpt"
+  fi
+
+  else
+    echo "[BOOT] Custom bootloader repo not found, using default OpenWrt sources"
+  fi
     97|
     98|
 ### MTK WiFi Optimization (TX Power & Region Unlock) ###

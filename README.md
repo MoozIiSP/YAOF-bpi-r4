@@ -131,6 +131,7 @@ BPI-R4 典型关注点包括：
 │   ├── BPI-R4/config.seed
 │   └── BPI-R4-PRO/config.seed
 ├── .github/workflows/      # GitHub Actions
+├── docs/                   # 介质策略、布局说明
 ```
 
 其中：
@@ -138,6 +139,7 @@ BPI-R4 典型关注点包括：
 - `SEED/BPI-R4/config.seed` 是当前主力配置
 - `SCRIPTS/BPI-R4/02_target_only.sh` 包含 BPI-R4 定向处理
 - `BPI-R4-PRO` 工作流已存在，但是否完整可用请以当前分支内容与发布结果为准
+- `docs/bpi-r4-storage-layout.md` 记录 NAND / eMMC / SD 的介质分工与分区策略
 
 ---
 

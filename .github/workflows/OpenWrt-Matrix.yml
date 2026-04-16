@@ -112,7 +112,7 @@ jobs:
           seed="${{ matrix.name }}"
 
           # artifact_prefix rule
-          artifact_prefix="${{ matrix.name }}-GC404"
+          artifact_prefix="YAOF-${{ matrix.name }}"
 
           # sha_match rule
           sha_match="$name_lower"
@@ -311,11 +311,11 @@ jobs:
         id: create_release
         uses: ncipollo/release-action@main
         with:
-          name: OpenWRT-${{ env.latest_release }}
+          name: YAOF for BPI-R4 ${{ env.latest_release }}
           allowUpdates: true
           prerelease: ${{ contains(env.latest_release, 'rc') }}
           tag: ${{ env.latest_release }}
-          commit: "24.10"
+          commit: ${{ github.sha }}
           replacesArtifacts: true
           token: ${{ secrets.GITHUB_TOKEN }}
           generateReleaseNotes: true

@@ -168,7 +168,7 @@ package:
       cd openwrt
 
       section_start artifacts "Package artifacts"
-      LATEST_RELEASE=$(curl -s https://github.com/openwrt/openwrt/tags | grep -Eo "v[0-9\\.]+\\-*r*c*[0-9]*.tar.gz" | sed -n '/[2-9][4-9]/p' | sed -n 1p | sed 's/.tar.gz//g' | sed 's/v//g')
+      LATEST_RELEASE=$(curl -s https://github.com/openwrt/openwrt/tags | grep -Eo "v[0-9\\.]+\\-*r*c*[0-9]*.tar.gz" | grep 'v24.10' | sed -n 1p | sed 's/.tar.gz//g' | sed 's/v//g')
       TARGET_LOWER=$(echo "$TARGET" | tr "A-Z" "a-z")
       if [ "$TARGET_LOWER" = "x86" ]; then
         SYSUPGRADE_GLOB="*combined-efi.img*"
@@ -195,13 +195,13 @@ package:
       ls -Ahl
       gzip -d *.gz || true
       gzip --best *.img
-      sha256sum openwrt*${TARGET_LOWER}* | tee ../${TARGET}-GC404-$(date +%Y-%m-%d)-${LATEST_RELEASE}.sha256sum
-      zip ../${TARGET}-GC404-$(date +%Y-%m-%d)-${LATEST_RELEASE}-ext4.zip ${EXT4_ZIP}
-      zip ../${TARGET}-GC404-$(date +%Y-%m-%d)-${LATEST_RELEASE}-sfs.zip ${SFS_ZIP}
+      sha256sum openwrt*${TARGET_LOWER}* | tee ../YAOF-${TARGET}-$(date +%Y-%m-%d)-${LATEST_RELEASE}.sha256sum
+      zip ../YAOF-${TARGET}-$(date +%Y-%m-%d)-${LATEST_RELEASE}-ext4.zip ${EXT4_ZIP}
+      zip ../YAOF-${TARGET}-$(date +%Y-%m-%d)-${LATEST_RELEASE}-sfs.zip ${SFS_ZIP}
       popd >/dev/null
 
       if [ -d ../artifact/packages ]; then
-        tar --zstd -cf ../artifact/${TARGET}-GC404-$(date +%Y-%m-%d)-${LATEST_RELEASE}-packages.tar.zst -C ../artifact packages
+        tar --zstd -cf ../artifact/YAOF-${TARGET}-$(date +%Y-%m-%d)-${LATEST_RELEASE}-packages.tar.zst -C ../artifact packages
       fi
       section_end artifacts
       EOS
@@ -237,11 +237,11 @@ release:
       for f in artifacts-*.zip; do unzip -o "$f"; done
       ls -R
 
-      LATEST_RELEASE=$(curl -s https://github.com/openwrt/openwrt/tags | grep -Eo "v[0-9\.]+\-*r*c*[0-9]*.tar.gz" | sed -n '/[2-9][4-9]/p' | sed -n 1p | sed 's/.tar.gz//g' | sed 's/v//g')
+      LATEST_RELEASE=$(curl -s https://github.com/openwrt/openwrt/tags | grep -Eo "v[0-9\.]+\-*r*c*[0-9]*.tar.gz" | grep 'v24.10' | sed -n 1p | sed 's/.tar.gz//g' | sed 's/v//g')
       ASSET_ARGS=$(find artifact -type f \( -name "*.zip" -o -name "*.sha256sum" -o -name "*.tar.zst" \) -printf "--assets-link '{\"name\":\"%f\",\"filepath\":\"%p\"}' ")
 
-      release-cli create --name "OpenWRT-${LATEST_RELEASE}" --tag-name "${LATEST_RELEASE}" \
-        --description "OpenWrt build for multiple targets. Release created by GitLab CI." \
+      release-cli create --name "YAOF for BPI-R4 ${LATEST_RELEASE}" --tag-name "${LATEST_RELEASE}" \
+        --description "YAOF build for Banana Pi BPI-R4 targets. Release created by GitLab CI." \
         $ASSET_ARGS
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

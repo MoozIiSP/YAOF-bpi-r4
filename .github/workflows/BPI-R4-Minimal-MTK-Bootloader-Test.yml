@@ -24,11 +24,12 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
-    if: github.event.repository.owner.id == github.event.sender.id
+    runs-on: self-hosted
     env:
       seed: BPI-R4-MINIMAL
     steps:
+      - uses: actions/checkout@v4
+
       - name: Resolve media-specific variables
         shell: bash
         run: |
@@ -49,25 +50,25 @@ jobs:
           esac
           echo "media=$media" >> "$GITHUB_ENV"
 
+      - name: Cache OpenWrt build directories
+        uses: actions/cache@v4
+        with:
+          path: |
+            openwrt/dl
+            openwrt/staging_dir
+            openwrt/build_dir/host*
+            openwrt/build_dir/toolchain*
+            mtk-feed
+            bl-mt798x-dhcpd
+          key: ${{ runner.os }}-openwrt-minimal-${{ hashFiles('SCRIPTS/01_get_ready_minimal.sh') }}-${{ hashFiles('SEED/BPI-R4-MINIMAL/config.seed') }}
+          restore-keys: |
+            ${{ runner.os }}-openwrt-minimal-${{ hashFiles('SCRIPTS/01_get_ready_minimal.sh') }}-
+
       - name: Show system info
         run: |
           echo -e "Total CPU cores\t: $(nproc)"
           grep 'model name' /proc/cpuinfo | head -n 4
           df -h
-
-      - name: Maximize build space
-        uses: easimon/maximize-build-space@master
-        with:
-          swap-size-mb: 2048
-          temp-reserve-mb: 128
-          root-reserve-mb: 1024
-          remove-dotnet: "true"
-          remove-android: "true"
-          remove-haskell: "true"
-          remove-codeql: "true"
-
-      - name: Checkout
-        uses: actions/checkout@v4
 
       - name: Init build dependencies
         env:

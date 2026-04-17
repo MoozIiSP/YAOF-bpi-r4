@@ -1,6 +1,5 @@
 #!/bin/bash
 set -euo pipefail
-clear
 
 rewrite_feeds() {
   local pkg_src=$1

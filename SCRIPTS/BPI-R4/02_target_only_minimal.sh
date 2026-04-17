@@ -1,6 +1,5 @@
 #!/bin/bash
 set -euo pipefail
-clear
 
 sed -i 's,-mcpu=generic,-march=armv8-a+crc+crypto,g' include/target.mk
 

@@ -43,7 +43,7 @@ if [ ! -d "openwrt/.git" ]; then
   
   # 4. Clone other repos (if missing)
   clone_repo "$openwrt_repo" openwrt-24.10 openwrt_snap &
-  clone_repo "$mtk_feed_repo" openwrt-24.10 mtk-feed &
+  clone_repo "$mtk_feed_repo" master mtk-feed &
   clone_repo "$custom_bootloader_repo" master bl-mt798x-dhcpd &
   
   wait
@@ -61,7 +61,7 @@ else
   echo "[MINIMAL] openwrt source detected."
   # Ensure sub-repos exist
   clone_repo "$openwrt_repo" openwrt-24.10 openwrt_snap
-  clone_repo "$mtk_feed_repo" openwrt-24.10 mtk-feed
+  clone_repo "$mtk_feed_repo" master mtk-feed
   clone_repo "$custom_bootloader_repo" master bl-mt798x-dhcpd
 fi
 

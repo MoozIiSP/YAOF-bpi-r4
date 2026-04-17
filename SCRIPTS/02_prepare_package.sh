@@ -45,9 +45,9 @@ fi
 # - MTK_SDK_TARBALL=/path/to.tgz   使用离线 SDK 包（可选）
 if [ "1" = "1" ]; then  # [MODIFIED] Force enable MTK Feed
   echo "[MTK] 启用 MediaTek feeds 集成"
-  MTK_FEED_URL=${MTK_FEED_URL:-https://git01.mediatek.com/openwrt/mtk-openwrt-feeds.git}
-  # 优先尝试与 openwrt-24.10 对齐；如需其他版本，请在 CI 变量中覆盖
-  MTK_FEED_BRANCH=${MTK_FEED_BRANCH:-openwrt-24.10}
+  MTK_FEED_URL=${MTK_FEED_URL:-https://git01.mediatek.com/openwrt/feeds/mtk-openwrt-feeds.git}
+  # MediaTek feed 当前仅提供 master 分支，24.10 内容位于仓库内的 24.10/ 子目录。
+  MTK_FEED_BRANCH=${MTK_FEED_BRANCH:-master}
   if ! grep -qE "^src-git mtk " feeds.conf.default; then
     echo "src-git mtk ${MTK_FEED_URL};${MTK_FEED_BRANCH}" >> feeds.conf.default
   fi

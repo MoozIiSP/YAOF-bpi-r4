@@ -21,8 +21,8 @@ rewrite_feeds "https://github.com/openwrt/packages.git;openwrt-24.10" \
               "https://github.com/openwrt/routing.git;openwrt-24.10" \
               "https://github.com/openwrt/telephony.git;openwrt-24.10"
 
-MTK_FEED_URL=${MTK_FEED_URL:-https://git01.mediatek.com/openwrt/mtk-openwrt-feeds.git}
-MTK_FEED_BRANCH=${MTK_FEED_BRANCH:-openwrt-24.10}
+MTK_FEED_URL=${MTK_FEED_URL:-https://git01.mediatek.com/openwrt/feeds/mtk-openwrt-feeds.git}
+MTK_FEED_BRANCH=${MTK_FEED_BRANCH:-master}
 if ! grep -qE "^src-git mtk " feeds.conf.default; then
   echo "src-git mtk ${MTK_FEED_URL};${MTK_FEED_BRANCH}" >> feeds.conf.default
 fi

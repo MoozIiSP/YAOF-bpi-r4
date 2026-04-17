@@ -41,7 +41,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-openwrt-minimal-${{ hashFiles('SCRIPTS/01_get_ready_minimal.sh') }}-
 
-      - name: Build in Docker
+      - name: Build with Podman
         env:
           INPUT_MEDIA: ${{ inputs.media || 'sd' }}
         run: |
@@ -55,14 +55,14 @@ jobs:
             GPT_LAYOUT="bpi-r4-sd-ab.json"
           fi
 
-          docker run --rm \
+          podman run --rm \
             -v ${{ github.workspace }}:/build \
             -w /build \
             -e CURRENT_UID=$CURRENT_UID \
             -e CURRENT_GID=$CURRENT_GID \
             -e BPI_R4_GPT_LAYOUT=$GPT_LAYOUT \
             ubuntu:24.04 \
-            bash <<'DOCKER_SCRIPT'
+            bash <<'PODMAN_SCRIPT'
             set -e
             
             # 1. Install dependencies
@@ -103,8 +103,10 @@ jobs:
             echo "=== Step 6: Compile ==="
             IGNORE_ERRORS=1 make -j$(nproc)
             
-            # 3. Fix permissions so runner can access cache
+            # 3. Fix permissions (only needed if podman runs as root by default)
             echo "=== Fixing Permissions ==="
-            chown -R $CURRENT_UID:$CURRENT_GID /build || true
+            if [ "$(id -u)" = "0" ]; then
+              chown -R $CURRENT_UID:$CURRENT_GID /build || true
+            fi
             
-            DOCKER_SCRIPT
+            PODMAN_SCRIPT

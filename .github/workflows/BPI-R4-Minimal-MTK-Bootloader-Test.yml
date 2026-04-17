@@ -94,7 +94,15 @@ jobs:
             echo "=== Step 5: Download ==="
             make download -j$(nproc)
             
-            echo "=== Step 6: Compile ==="
+            echo "=== Step 6: Refresh host tar ==="
+            rm -rf build_dir/host/tar-* \
+              staging_dir/host/stamp/.tar_installed \
+              staging_dir/host/bin/tar \
+              staging_dir/host/share/man/man1/tar.1 \
+              staging_dir/host/man/man1/tar.1
+            make -j1 V=sc tools/tar/compile
+
+            echo "=== Step 7: Compile ==="
             IGNORE_ERRORS=1 make -j$(nproc)
             
             # 3. Fix permissions

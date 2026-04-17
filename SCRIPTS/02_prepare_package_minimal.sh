@@ -1,6 +1,14 @@
 #!/bin/bash
 set -euo pipefail
 
+sed_in_place() {
+  if sed --version >/dev/null 2>&1; then
+    sed -i "$@"
+  else
+    sed -i '' "$@"
+  fi
+}
+
 rewrite_feeds() {
   local pkg_src=$1
   local luci_src=$2
@@ -8,10 +16,10 @@ rewrite_feeds() {
   local telephony_src=$4
   for feed_file in feeds.conf feeds.conf.default; do
     if [ -f "$feed_file" ]; then
-      sed -i "s#https://git.openwrt.org/feed/packages.git[^ ]*#$pkg_src#g" "$feed_file"
-      sed -i "s#https://git.openwrt.org/project/luci.git[^ ]*#$luci_src#g" "$feed_file"
-      sed -i "s#https://git.openwrt.org/feed/routing.git[^ ]*#$routing_src#g" "$feed_file"
-      sed -i "s#https://git.openwrt.org/feed/telephony.git[^ ]*#$telephony_src#g" "$feed_file"
+      sed_in_place "s#https://git.openwrt.org/feed/packages.git[^ ]*#$pkg_src#g" "$feed_file"
+      sed_in_place "s#https://git.openwrt.org/project/luci.git[^ ]*#$luci_src#g" "$feed_file"
+      sed_in_place "s#https://git.openwrt.org/feed/routing.git[^ ]*#$routing_src#g" "$feed_file"
+      sed_in_place "s#https://git.openwrt.org/feed/telephony.git[^ ]*#$telephony_src#g" "$feed_file"
     fi
   done
 }
@@ -20,6 +28,13 @@ rewrite_feeds "https://github.com/openwrt/packages.git;openwrt-24.10" \
               "https://github.com/openwrt/luci.git;openwrt-24.10" \
               "https://github.com/openwrt/routing.git;openwrt-24.10" \
               "https://github.com/openwrt/telephony.git;openwrt-24.10"
+
+# MTK feed integration intentionally disabled for now because the upstream URL currently returns 404.
+# MTK_FEED_URL=${MTK_FEED_URL:-https://git01.mediatek.com/openwrt/feeds/mtk-openwrt-feeds.git}
+# MTK_FEED_BRANCH=${MTK_FEED_BRANCH:-master}
+# if ! grep -qE "^src-git mtk " feeds.conf.default; then
+#   echo "src-git mtk ${MTK_FEED_URL};${MTK_FEED_BRANCH}" >> feeds.conf.default
+# fi
 
 if ! ./scripts/feeds update -a; then
   echo "GitHub 镜像更新失败，尝试切换回官方源..."
@@ -31,6 +46,7 @@ if ! ./scripts/feeds update -a; then
 fi
 
 ./scripts/feeds install -a
+# ./scripts/feeds install -a -p mtk -f || true
 
 if [ -d "../bl-mt798x-dhcpd" ]; then
   echo "[BOOT] Found custom bootloader repo: bl-mt798x-dhcpd"
@@ -60,10 +76,10 @@ else
   echo "[BOOT] Custom bootloader repo not found, using default OpenWrt sources"
 fi
 
-sed -i 's,-SNAPSHOT,,g' include/version.mk
-sed -i 's,-SNAPSHOT,,g' package/base-files/image-config.in
-sed -i '/CONFIG_BUILDBOT/d' include/feeds.mk
-sed -i 's/;)\s*\\/; \\/' include/feeds.mk
-sed -i 's,CONFIG_WERROR=y,# CONFIG_WERROR is not set,g' target/linux/generic/config-6.6 || true
+sed_in_place 's,-SNAPSHOT,,g' include/version.mk
+sed_in_place 's,-SNAPSHOT,,g' package/base-files/image-config.in
+sed_in_place '/CONFIG_BUILDBOT/d' include/feeds.mk
+sed_in_place 's/;)\s*\\/; \\/' include/feeds.mk
+sed_in_place 's,CONFIG_WERROR=y,# CONFIG_WERROR is not set,g' target/linux/generic/config-6.6 || true
 
 echo "[MINIMAL] Minimal package preparation complete."

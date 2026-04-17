@@ -37,6 +37,14 @@ if ! ./scripts/feeds install -a; then
 fi
 
 ### 基础部分 ###
+# 可选：接入 MediaTek 的 OpenWrt feeds 或本地 SDK（当前默认禁用，因上游地址 404）
+# 如后续恢复可用，可重新启用下面逻辑：
+# MTK_FEED_URL=${MTK_FEED_URL:-https://git01.mediatek.com/openwrt/feeds/mtk-openwrt-feeds.git}
+# MTK_FEED_BRANCH=${MTK_FEED_BRANCH:-master}
+# if ! grep -qE "^src-git mtk " feeds.conf.default; then
+#   echo "src-git mtk ${MTK_FEED_URL};${MTK_FEED_BRANCH}" >> feeds.conf.default
+# fi
+
 ### Custom Bootloader (Yuzhii0718) & GPT for A/B Partition ###
 if [ -d "../bl-mt798x-dhcpd" ]; then
   echo "[BOOT] Found custom bootloader repo: bl-mt798x-dhcpd"
@@ -72,6 +80,7 @@ if [ -d "../bl-mt798x-dhcpd" ]; then
 
 
 ### WiFi regdb Optimization (OpenWrt tree only) ###
+# Former MTK feed-specific sync is intentionally disabled together with MTK feed integration.
 rm -rf ./package/firmware/wireless-regdb/patches/*
 cp ../PATCH/kernel/mtk_wifi/500-tx_power.patch ./package/firmware/wireless-regdb/patches/ 2>/dev/null || true
 if [ -f "../PATCH/kernel/mtk_wifi/regdb.Makefile" ]; then

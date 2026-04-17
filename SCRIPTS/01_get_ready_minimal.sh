@@ -14,6 +14,7 @@ clone_repo() {
 
 latest_release="$(curl -s https://github.com/openwrt/openwrt/tags | grep -Eo 'v[0-9\.]+\-*r*c*[0-9]*.tar.gz' | grep 'v24.10' | sed -n 1p | sed 's/.tar.gz//g')"
 openwrt_repo="https://github.com/openwrt/openwrt.git"
+# mtk_feed_repo="https://git01.mediatek.com/openwrt/feeds/mtk-openwrt-feeds.git"  # disabled: upstream currently 404
 custom_bootloader_repo="https://github.com/Yuzhii0718/bl-mt798x-dhcpd.git"
 
 # Check if openwrt source exists and is a git repo
@@ -42,6 +43,7 @@ if [ ! -d "openwrt/.git" ]; then
   
   # 4. Clone other repos (if missing)
   clone_repo "$openwrt_repo" openwrt-24.10 openwrt_snap &
+  # clone_repo "$mtk_feed_repo" master mtk-feed &
   clone_repo "$custom_bootloader_repo" master bl-mt798x-dhcpd &
   
   wait
@@ -59,7 +61,8 @@ else
   echo "[MINIMAL] openwrt source detected."
   # Ensure sub-repos exist
   clone_repo "$openwrt_repo" openwrt-24.10 openwrt_snap
+  # clone_repo "$mtk_feed_repo" master mtk-feed
   clone_repo "$custom_bootloader_repo" master bl-mt798x-dhcpd
 fi
 
-echo "[MINIMAL] OpenWrt base and custom bootloader sources are ready."
+echo "[MINIMAL] OpenWrt base and custom bootloader sources are ready. (MTK feed currently disabled)"

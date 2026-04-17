@@ -55,18 +55,12 @@ jobs:
             GPT_LAYOUT="bpi-r4-sd-ab.json"
           fi
 
-          podman run --rm \
-            -v ${{ github.workspace }}:/build \
-            -w /build \
-            -e CURRENT_UID=$CURRENT_UID \
-            -e CURRENT_GID=$CURRENT_GID \
-            -e BPI_R4_GPT_LAYOUT=$GPT_LAYOUT \
-            ubuntu:24.04 \
-            bash <<'PODMAN_SCRIPT'
+          # Write build script to a file to avoid indentation issues
+          cat > build_script.sh <<'SCRIPT'
             set -e
+            export DEBIAN_FRONTEND=noninteractive
             
             # 1. Install dependencies
-            export DEBIAN_FRONTEND=noninteractive
             apt-get -o Acquire::Languages=none update -qq
             apt-get install -y -qq --no-install-recommends \
               asciidoc bash bin86 binutils bison bzip2 clang file flex g++ g++-multilib gawk \
@@ -103,10 +97,18 @@ jobs:
             echo "=== Step 6: Compile ==="
             IGNORE_ERRORS=1 make -j$(nproc)
             
-            # 3. Fix permissions (only needed if podman runs as root by default)
+            # 3. Fix permissions
             echo "=== Fixing Permissions ==="
             if [ "$(id -u)" = "0" ]; then
               chown -R $CURRENT_UID:$CURRENT_GID /build || true
             fi
-            
-            PODMAN_SCRIPT
+          SCRIPT
+
+          podman run --rm \
+            -v ${{ github.workspace }}:/build \
+            -w /build \
+            -e CURRENT_UID=$CURRENT_UID \
+            -e CURRENT_GID=$CURRENT_GID \
+            -e BPI_R4_GPT_LAYOUT=$GPT_LAYOUT \
+            ubuntu:24.04 \
+            bash build_script.sh

@@ -21,12 +21,6 @@ rewrite_feeds "https://github.com/openwrt/packages.git;openwrt-24.10" \
               "https://github.com/openwrt/routing.git;openwrt-24.10" \
               "https://github.com/openwrt/telephony.git;openwrt-24.10"
 
-MTK_FEED_URL=${MTK_FEED_URL:-https://git01.mediatek.com/openwrt/feeds/mtk-openwrt-feeds.git}
-MTK_FEED_BRANCH=${MTK_FEED_BRANCH:-master}
-if ! grep -qE "^src-git mtk " feeds.conf.default; then
-  echo "src-git mtk ${MTK_FEED_URL};${MTK_FEED_BRANCH}" >> feeds.conf.default
-fi
-
 if ! ./scripts/feeds update -a; then
   echo "GitHub 镜像更新失败，尝试切换回官方源..."
   rewrite_feeds "https://git.openwrt.org/feed/packages.git;openwrt-24.10" \
@@ -37,7 +31,6 @@ if ! ./scripts/feeds update -a; then
 fi
 
 ./scripts/feeds install -a
-./scripts/feeds install -a -p mtk -f || true
 
 if [ -d "../bl-mt798x-dhcpd" ]; then
   echo "[BOOT] Found custom bootloader repo: bl-mt798x-dhcpd"

@@ -37,36 +37,6 @@ if ! ./scripts/feeds install -a; then
 fi
 
 ### 基础部分 ###
-# 可选：接入 MediaTek 的 OpenWrt feeds 或本地 SDK
-# 通过环境变量控制，不默认启用，以免影响现有构建：
-# - USE_MTK_FEED=1                 启用在线 mtk feeds
-#   MTK_FEED_URL=...               feeds 仓库地址（可选，留空用默认）
-#   MTK_FEED_BRANCH=...            分支（可选，默认尝试与底座版本匹配）
-# - MTK_SDK_TARBALL=/path/to.tgz   使用离线 SDK 包（可选）
-if [ "1" = "1" ]; then  # [MODIFIED] Force enable MTK Feed
-  echo "[MTK] 启用 MediaTek feeds 集成"
-  MTK_FEED_URL=${MTK_FEED_URL:-https://git01.mediatek.com/openwrt/feeds/mtk-openwrt-feeds.git}
-  # MediaTek feed 当前仅提供 master 分支，24.10 内容位于仓库内的 24.10/ 子目录。
-  MTK_FEED_BRANCH=${MTK_FEED_BRANCH:-master}
-  if ! grep -qE "^src-git mtk " feeds.conf.default; then
-    echo "src-git mtk ${MTK_FEED_URL};${MTK_FEED_BRANCH}" >> feeds.conf.default
-  fi
-fi
-
-if [ -n "${MTK_SDK_TARBALL:-}" ]; then
-  echo "[MTK] 使用本地 SDK 包：${MTK_SDK_TARBALL}"
-  mkdir -p ../mtk-sdk
-  tar -xf "${MTK_SDK_TARBALL}" -C ../mtk-sdk || {
-    echo "[MTK] 解压 SDK 失败" >&2; exit 2;
-  }
-  # 如果离线 SDK 中提供了 feeds 目录，作为本地 feed 接入
-  if [ -d ../mtk-sdk/feeds ]; then
-    if ! grep -qE "^src-link mtk-sdk " feeds.conf.default; then
-      echo "src-link mtk-sdk ../mtk-sdk/feeds" >> feeds.conf.default
-    fi
-  fi
-fi
-
 ### Custom Bootloader (Yuzhii0718) & GPT for A/B Partition ###
 if [ -d "../bl-mt798x-dhcpd" ]; then
   echo "[BOOT] Found custom bootloader repo: bl-mt798x-dhcpd"
@@ -101,25 +71,11 @@ if [ -d "../bl-mt798x-dhcpd" ]; then
   fi
 
 
-### MTK WiFi Optimization (TX Power & Region Unlock) ###
-# Unlock WiFi region restrictions and maximize TX power
-if [ -d "../mtk-feed" ]; then
-  echo "[WIFI] Applying TX power and region unlock for MTK WiFi..."
-  
-  # 1. Replace wireless-regdb patches in OpenWrt source
-  rm -rf ./package/firmware/wireless-regdb/patches/*
-  cp ../PATCH/kernel/mtk_wifi/500-tx_power.patch ./package/firmware/wireless-regdb/patches/ 2>/dev/null || true
-  if [ -f "../PATCH/kernel/mtk_wifi/regdb.Makefile" ]; then
-    cp ../PATCH/kernel/mtk_wifi/regdb.Makefile ./package/firmware/wireless-regdb/Makefile
-  fi
-
-  # 2. Also apply to MTK feed structure (it has its own copy)
-  # MTK feed puts wireless-regdb patches in a specific location
-  MTK_REGDB_PATH="../mtk-feed/autobuild/unified/filogic/mac80211/24.10/files/package/firmware/wireless-regdb/patches"
-  if [ -d "$MTK_REGDB_PATH" ]; then
-    rm -rf $MTK_REGDB_PATH/*
-    cp ../PATCH/kernel/mtk_wifi/500-tx_power.patch $MTK_REGDB_PATH/ 2>/dev/null || true
-  fi
+### WiFi regdb Optimization (OpenWrt tree only) ###
+rm -rf ./package/firmware/wireless-regdb/patches/*
+cp ../PATCH/kernel/mtk_wifi/500-tx_power.patch ./package/firmware/wireless-regdb/patches/ 2>/dev/null || true
+if [ -f "../PATCH/kernel/mtk_wifi/regdb.Makefile" ]; then
+  cp ../PATCH/kernel/mtk_wifi/regdb.Makefile ./package/firmware/wireless-regdb/Makefile
 fi
 
 # 使用 O2 级别的优化

@@ -1,4 +1,4 @@
-name: BPI-R4-Minimal-MTK-Bootloader-Test
+name: BPI-R4-Minimal-Bootloader-Test
 run-name: Minimal BPI-R4 test · ${{ inputs.media }} · ${{ github.ref_name }}
 
 on:
@@ -35,7 +35,6 @@ jobs:
             openwrt/dl
             openwrt/staging_dir
             openwrt/build_dir
-            mtk-feed
             bl-mt798x-dhcpd
           key: ${{ runner.os }}-openwrt-minimal-${{ hashFiles('SCRIPTS/01_get_ready_minimal.sh') }}-${{ hashFiles('SEED/BPI-R4-MINIMAL/config.seed') }}
           restore-keys: |

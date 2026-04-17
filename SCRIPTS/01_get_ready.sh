@@ -60,10 +60,6 @@ clone_repo $dockerman_repo master dockerman &
 clone_repo $docker_lib_repo master docker_lib &
 clone_repo $luci_theme_design_repo master luci_theme_design_repo &
 # 等待所有后台任务完成
-# MTK Official Feed
-# MediaTek feed currently exposes 24.10 content under the master branch.
-clone_repo "https://git01.mediatek.com/openwrt/feeds/mtk-openwrt-feeds.git" "master" "mtk-feed" &
-
 # Custom Bootloader with DHCPD/WebUI (Yuzhii0718)
 clone_repo "https://github.com/Yuzhii0718/bl-mt798x-dhcpd.git" "master" "bl-mt798x-dhcpd" &
 

@@ -9,6 +9,16 @@ sed_in_place() {
   fi
 }
 
+disable_mtk_feed() {
+  for feed_file in feeds.conf feeds.conf.default; do
+    if [ -f "$feed_file" ]; then
+      sed_in_place '/^src-git\(-full\)\? mtk /d' "$feed_file"
+    fi
+  done
+
+  rm -rf ./feeds/mtk ./feeds/mtk.index
+}
+
 rewrite_feeds() {
   local pkg_src=$1
   local luci_src=$2
@@ -28,6 +38,7 @@ rewrite_feeds "https://github.com/openwrt/packages.git;openwrt-24.10" \
               "https://github.com/openwrt/luci.git;openwrt-24.10" \
               "https://github.com/openwrt/routing.git;openwrt-24.10" \
               "https://github.com/openwrt/telephony.git;openwrt-24.10"
+disable_mtk_feed
 
 # MTK feed integration intentionally disabled for now because the upstream URL currently returns 404.
 # MTK_FEED_URL=${MTK_FEED_URL:-https://git01.mediatek.com/openwrt/feeds/mtk-openwrt-feeds.git}
@@ -42,6 +53,7 @@ if ! ./scripts/feeds update -a; then
                 "https://git.openwrt.org/project/luci.git;openwrt-24.10" \
                 "https://git.openwrt.org/feed/routing.git;openwrt-24.10" \
                 "https://git.openwrt.org/feed/telephony.git;openwrt-24.10"
+  disable_mtk_feed
   ./scripts/feeds update -a
 fi
 

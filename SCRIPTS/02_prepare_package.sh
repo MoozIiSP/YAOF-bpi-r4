@@ -1,6 +1,14 @@
 #!/bin/bash
 clear
 
+sed_in_place() {
+  if sed --version >/dev/null 2>&1; then
+    sed -i "$@"
+  else
+    sed -i '' "$@"
+  fi
+}
+
 ### feeds 优化 ###
 # 先尝试 GitHub 镜像，失败后回退到 git.openwrt.org
 rewrite_feeds() {
@@ -10,18 +18,29 @@ rewrite_feeds() {
   local telephony_src=$4
   for feed_file in feeds.conf feeds.conf.default; do
     if [ -f "$feed_file" ]; then
-      sed -i "s#https://git.openwrt.org/feed/packages.git[^ ]*#$pkg_src#g" "$feed_file"
-      sed -i "s#https://git.openwrt.org/project/luci.git[^ ]*#$luci_src#g" "$feed_file"
-      sed -i "s#https://git.openwrt.org/feed/routing.git[^ ]*#$routing_src#g" "$feed_file"
-      sed -i "s#https://git.openwrt.org/feed/telephony.git[^ ]*#$telephony_src#g" "$feed_file"
+      sed_in_place "s#https://git.openwrt.org/feed/packages.git[^ ]*#$pkg_src#g" "$feed_file"
+      sed_in_place "s#https://git.openwrt.org/project/luci.git[^ ]*#$luci_src#g" "$feed_file"
+      sed_in_place "s#https://git.openwrt.org/feed/routing.git[^ ]*#$routing_src#g" "$feed_file"
+      sed_in_place "s#https://git.openwrt.org/feed/telephony.git[^ ]*#$telephony_src#g" "$feed_file"
     fi
   done
+}
+
+disable_mtk_feed() {
+  for feed_file in feeds.conf feeds.conf.default; do
+    if [ -f "$feed_file" ]; then
+      sed_in_place '/^src-git\(-full\)\? mtk /d' "$feed_file"
+    fi
+  done
+
+  rm -rf ./feeds/mtk ./feeds/mtk.index
 }
 
 rewrite_feeds "https://github.com/openwrt/packages.git;openwrt-24.10" \
               "https://github.com/openwrt/luci.git;openwrt-24.10" \
               "https://github.com/openwrt/routing.git;openwrt-24.10" \
               "https://github.com/openwrt/telephony.git;openwrt-24.10"
+disable_mtk_feed
 
 if ! ./scripts/feeds update -a; then
   echo "GitHub 镜像更新失败，尝试切换回官方源..."
@@ -29,6 +48,7 @@ if ! ./scripts/feeds update -a; then
                 "https://git.openwrt.org/project/luci.git;openwrt-24.10" \
                 "https://git.openwrt.org/feed/routing.git;openwrt-24.10" \
                 "https://git.openwrt.org/feed/telephony.git;openwrt-24.10"
+  disable_mtk_feed
   ./scripts/feeds update -a
 fi
 
@@ -88,31 +108,37 @@ if [ -f "../PATCH/kernel/mtk_wifi/regdb.Makefile" ]; then
 fi
 
 # 使用 O2 级别的优化
-sed -i 's/Os/O2/g' include/target.mk
+sed_in_place 's/Os/O2/g' include/target.mk
 # 移除 SNAPSHOT 标签
-sed -i 's,-SNAPSHOT,,g' include/version.mk
-sed -i 's,-SNAPSHOT,,g' package/base-files/image-config.in
-sed -i '/CONFIG_BUILDBOT/d' include/feeds.mk
-sed -i 's/;)\s*\\/; \\/' include/feeds.mk
+sed_in_place 's,-SNAPSHOT,,g' include/version.mk
+sed_in_place 's,-SNAPSHOT,,g' package/base-files/image-config.in
+sed_in_place '/CONFIG_BUILDBOT/d' include/feeds.mk
+sed_in_place 's/;)\s*\\/; \\/' include/feeds.mk
 # Nginx
-sed -i "s/large_client_header_buffers 2 1k/large_client_header_buffers 4 32k/g" feeds/packages/net/nginx-util/files/uci.conf.template
-sed -i "s/client_max_body_size 128M/client_max_body_size 2048M/g" feeds/packages/net/nginx-util/files/uci.conf.template
-sed -i '/client_max_body_size/a\\tclient_body_buffer_size 8192M;' feeds/packages/net/nginx-util/files/uci.conf.template
-sed -i '/client_max_body_size/a\\tserver_names_hash_bucket_size 128;' feeds/packages/net/nginx-util/files/uci.conf.template
-sed -i '/ubus_parallel_req/a\        ubus_script_timeout 600;' feeds/packages/net/nginx/files-luci-support/60_nginx-luci-support
-sed -ri "/luci-webui.socket/i\ \t\tuwsgi_send_timeout 600\;\n\t\tuwsgi_connect_timeout 600\;\n\t\tuwsgi_read_timeout 600\;" feeds/packages/net/nginx/files-luci-support/luci.locations
-sed -ri "/luci-cgi_io.socket/i\ \t\tuwsgi_send_timeout 600\;\n\t\tuwsgi_connect_timeout 600\;\n\t\tuwsgi_read_timeout 600\;" feeds/packages/net/nginx/files-luci-support/luci.locations
+sed_in_place "s/large_client_header_buffers 2 1k/large_client_header_buffers 4 32k/g" feeds/packages/net/nginx-util/files/uci.conf.template
+sed_in_place "s/client_max_body_size 128M/client_max_body_size 2048M/g" feeds/packages/net/nginx-util/files/uci.conf.template
+sed_in_place '/client_max_body_size/a\\tclient_body_buffer_size 8192M;' feeds/packages/net/nginx-util/files/uci.conf.template
+sed_in_place '/client_max_body_size/a\\tserver_names_hash_bucket_size 128;' feeds/packages/net/nginx-util/files/uci.conf.template
+sed_in_place '/ubus_parallel_req/a\        ubus_script_timeout 600;' feeds/packages/net/nginx/files-luci-support/60_nginx-luci-support
+sed_in_place -E "/luci-webui.socket/i\\
+\t\tuwsgi_send_timeout 600;\\
+\t\tuwsgi_connect_timeout 600;\\
+\t\tuwsgi_read_timeout 600;" feeds/packages/net/nginx/files-luci-support/luci.locations
+sed_in_place -E "/luci-cgi_io.socket/i\\
+\t\tuwsgi_send_timeout 600;\\
+\t\tuwsgi_connect_timeout 600;\\
+\t\tuwsgi_read_timeout 600;" feeds/packages/net/nginx/files-luci-support/luci.locations
 # uwsgi
-sed -i 's,procd_set_param stderr 1,procd_set_param stderr 0,g' feeds/packages/net/uwsgi/files/uwsgi.init
-sed -i 's,buffer-size = 10000,buffer-size = 131072,g' feeds/packages/net/uwsgi/files-luci-support/luci-webui.ini
-sed -i 's,logger = luci,#logger = luci,g' feeds/packages/net/uwsgi/files-luci-support/luci-webui.ini
-sed -i '$a cgi-timeout = 600' feeds/packages/net/uwsgi/files-luci-support/luci-*.ini
-sed -i 's/threads = 1/threads = 2/g' feeds/packages/net/uwsgi/files-luci-support/luci-webui.ini
-sed -i 's/processes = 3/processes = 4/g' feeds/packages/net/uwsgi/files-luci-support/luci-webui.ini
-sed -i 's/cheaper = 1/cheaper = 2/g' feeds/packages/net/uwsgi/files-luci-support/luci-webui.ini
+sed_in_place 's,procd_set_param stderr 1,procd_set_param stderr 0,g' feeds/packages/net/uwsgi/files/uwsgi.init
+sed_in_place 's,buffer-size = 10000,buffer-size = 131072,g' feeds/packages/net/uwsgi/files-luci-support/luci-webui.ini
+sed_in_place 's,logger = luci,#logger = luci,g' feeds/packages/net/uwsgi/files-luci-support/luci-webui.ini
+sed_in_place '$a cgi-timeout = 600' feeds/packages/net/uwsgi/files-luci-support/luci-*.ini
+sed_in_place 's/threads = 1/threads = 2/g' feeds/packages/net/uwsgi/files-luci-support/luci-webui.ini
+sed_in_place 's/processes = 3/processes = 4/g' feeds/packages/net/uwsgi/files-luci-support/luci-webui.ini
+sed_in_place 's/cheaper = 1/cheaper = 2/g' feeds/packages/net/uwsgi/files-luci-support/luci-webui.ini
 # rpcd
-sed -i 's/option timeout 30/option timeout 60/g' package/system/rpcd/files/rpcd.config
-sed -i 's#20) \* 1000#60) \* 1000#g' feeds/luci/modules/luci-base/htdocs/luci-static/resources/rpc.js
+sed_in_place 's/option timeout 30/option timeout 60/g' package/system/rpcd/files/rpcd.config
+sed_in_place 's#20) \* 1000#60) \* 1000#g' feeds/luci/modules/luci-base/htdocs/luci-static/resources/rpc.js
 
 ### FW4 ###
 rm -rf ./package/network/config/firewall4
@@ -176,7 +202,7 @@ mkdir -p package/network/config/firewall4/patches
 #cp -f ../PATCH/pkgs/firewall/firewall4_patches/*.patch ./package/network/config/firewall4/patches/
 mkdir -p package/libs/libnftnl/patches
 cp -f ../PATCH/pkgs/firewall/libnftnl/*.patch ./package/libs/libnftnl/patches/
-sed -i '/PKG_INSTALL:=/iPKG_FIXUP:=autoreconf' package/libs/libnftnl/Makefile
+sed_in_place '/PKG_INSTALL:=/iPKG_FIXUP:=autoreconf' package/libs/libnftnl/Makefile
 mkdir -p package/network/utils/nftables/patches
 cp -f ../PATCH/pkgs/firewall/nftables/*.patch ./package/network/utils/nftables/patches/
 # Patch LuCI 以增添 FullCone 开关

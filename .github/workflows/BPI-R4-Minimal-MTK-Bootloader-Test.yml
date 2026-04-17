@@ -9,11 +9,6 @@ on:
         required: false
         type: string
         default: "sd"
-      upload_source:
-        description: "Upload source archive before build"
-        required: false
-        type: boolean
-        default: false
 
 permissions:
   contents: read
@@ -28,27 +23,10 @@ jobs:
     env:
       seed: BPI-R4-MINIMAL
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Resolve media-specific variables
-        shell: bash
-        run: |
-          media=$(echo "${{ inputs.media }}" | tr 'A-Z' 'a-z' | xargs)
-          case "$media" in
-            sd)
-              echo "bundle_kind=sd" >> "$GITHUB_ENV"
-              echo "gpt_layout=bpi-r4-sd-ab.json" >> "$GITHUB_ENV"
-              ;;
-            emmc)
-              echo "bundle_kind=emmc" >> "$GITHUB_ENV"
-              echo "gpt_layout=bpi-r4-emmc-8g-ab.json" >> "$GITHUB_ENV"
-              ;;
-            *)
-              echo "Unsupported media: $media" >&2
-              exit 2
-              ;;
-          esac
-          echo "media=$media" >> "$GITHUB_ENV"
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          clean: false
 
       - name: Cache OpenWrt build directories
         uses: actions/cache@v4
@@ -56,98 +34,77 @@ jobs:
           path: |
             openwrt/dl
             openwrt/staging_dir
-            openwrt/build_dir/host*
-            openwrt/build_dir/toolchain*
+            openwrt/build_dir
             mtk-feed
             bl-mt798x-dhcpd
           key: ${{ runner.os }}-openwrt-minimal-${{ hashFiles('SCRIPTS/01_get_ready_minimal.sh') }}-${{ hashFiles('SEED/BPI-R4-MINIMAL/config.seed') }}
           restore-keys: |
             ${{ runner.os }}-openwrt-minimal-${{ hashFiles('SCRIPTS/01_get_ready_minimal.sh') }}-
 
-      - name: Show system info
-        run: |
-          echo -e "Total CPU cores\t: $(nproc)"
-          grep 'model name' /proc/cpuinfo | head -n 4
-          df -h
-
-      - name: Init build dependencies
+      - name: Build in Docker
         env:
-          DEBIAN_FRONTEND: noninteractive
+          INPUT_MEDIA: ${{ inputs.media || 'sd' }}
         run: |
-          sudo rm -rf /var/lib/apt/lists/* || true
-          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL || true
-          sudo -E apt-get -o Acquire::Languages=none -qq update
-          sudo -E apt-get -y -qq --no-install-recommends install asciidoc bash bin86 binutils bison bzip2 clang llvm file flex g++ g++-multilib gawk gcc-multilib gettext git gzip help2man intltool jq libbpf-dev libelf-dev libncurses-dev libssl-dev libthread-queue-any-perl libusb-dev libxml-parser-perl make patch perl-modules pkg-config python3-dev python3-pip python3-pyelftools python3-setuptools rsync sharutils swig time unzip util-linux wget xsltproc xz-utils zlib1g-dev zip zstd dwarves dos2unix npm quilt
-          sudo -E npm install -g pnpm
-          pip3 install --user -U pylibfdt --break-system-packages
-          sudo -E apt-get -qq autoremove --purge
-          sudo -E apt-get -qq clean
-          sudo -E git config --global user.name 'GitHub Actions'
-          sudo -E git config --global user.email 'noreply@github.com'
-          df -h
+          CURRENT_UID=$(id -u)
+          CURRENT_GID=$(id -g)
+          
+          # Resolve GPT layout based on media
+          if [ "$INPUT_MEDIA" = "emmc" ]; then
+            GPT_LAYOUT="bpi-r4-emmc-8g-ab.json"
+          else
+            GPT_LAYOUT="bpi-r4-sd-ab.json"
+          fi
 
-      - name: Prepare minimal sources
-        run: |
-          sudo chown -R runner:runner "$(dirname "$GITHUB_WORKSPACE")"
-          cp -r ./SCRIPTS/BPI-R4/. ./SCRIPTS/
-          cp -r ./SCRIPTS/. ./
-          /bin/bash 01_get_ready_minimal.sh
+          docker run --rm \
+            -v ${{ github.workspace }}:/build \
+            -w /build \
+            -e CURRENT_UID=$CURRENT_UID \
+            -e CURRENT_GID=$CURRENT_GID \
+            -e BPI_R4_GPT_LAYOUT=$GPT_LAYOUT \
+            ubuntu:24.04 \
+            bash <<'DOCKER_SCRIPT'
+            set -e
+            
+            # 1. Install dependencies
+            export DEBIAN_FRONTEND=noninteractive
+            apt-get -o Acquire::Languages=none update -qq
+            apt-get install -y -qq --no-install-recommends \
+              asciidoc bash bin86 binutils bison bzip2 clang file flex g++ g++-multilib gawk \
+              gcc-multilib gettext git gzip help2man intltool jq libbpf-dev libelf-dev \
+              libncurses-dev libssl-dev libthread-queue-any-perl libusb-dev libxml-parser-perl \
+              make patch perl-modules pkg-config python3-dev python3-pip python3-pyelftools \
+              python3-setuptools rsync sharutils swig time unzip util-linux wget xsltproc \
+              xz-utils zlib1g-dev zip zstd dwarves dos2unix npm quilt bc llvm
 
-      - name: Prepare minimal package set
-        working-directory: ${{ github.workspace }}/openwrt
-        env:
-          BPI_R4_GPT_LAYOUT: ${{ env.gpt_layout }}
-        run: |
-          cp -r ../SCRIPTS/. ./
-          /bin/bash 02_prepare_package_minimal.sh
-          /bin/bash 02_target_only_minimal.sh
-
-      - name: Seed minimal config
-        working-directory: ${{ github.workspace }}/openwrt
-        run: |
-          cp -rf ../SEED/${{ env.seed }}/config.seed .config
-
-      - name: Make defconfig
-        working-directory: ${{ github.workspace }}/openwrt
-        run: make defconfig
-
-      - name: Archive source
-        if: inputs.upload_source
-        run: tar -cf openwrt-source-minimal-${{ env.media }}-${{ github.run_id }}.tar openwrt
-
-      - name: Upload source archive
-        if: inputs.upload_source
-        uses: actions/upload-artifact@v4
-        with:
-          name: openwrt-source-minimal-${{ env.media }}-${{ github.run_id }}
-          path: openwrt-source-minimal-${{ env.media }}-${{ github.run_id }}.tar
-          retention-days: 5
-
-      - name: Make download
-        working-directory: ${{ github.workspace }}/openwrt
-        run: make download -j$(($(nproc) + 1))
-
-      - name: Compile minimal OpenWrt
-        working-directory: ${{ github.workspace }}/openwrt
-        id: compile
-        continue-on-error: true
-        run: IGNORE_ERRORS=1 make -j$(($(nproc) + 1))
-
-      - name: Print verbose failure log
-        if: steps.compile.outcome == 'failure'
-        working-directory: ${{ github.workspace }}/openwrt
-        run: |
-          cat .config
-          echo '================================================================'
-          make -j1 V=s
-
-      - name: Upload build artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: bpi-r4-minimal-${{ env.media }}-${{ github.run_id }}
-          path: |
-            openwrt/.config
-            openwrt/bin/targets/mediatek/filogic/*
-          if-no-files-found: warn
-          retention-days: 7
+            npm install -g pnpm
+            pip3 install --user -U pylibfdt --break-system-packages
+            
+            # 2. Execute scripts
+            chmod +x SCRIPTS/*.sh
+            chmod +x SCRIPTS/BPI-R4/*.sh
+            
+            echo "=== Step 1: Get Ready ==="
+            bash SCRIPTS/01_get_ready_minimal.sh
+            
+            echo "=== Step 2: Prepare Package ==="
+            cd openwrt
+            bash ../SCRIPTS/02_prepare_package_minimal.sh
+            bash ../SCRIPTS/02_target_only_minimal.sh
+            
+            echo "=== Step 3: Config ==="
+            cp -rf ../SEED/BPI-R4-MINIMAL/config.seed .config
+            
+            echo "=== Step 4: Defconfig ==="
+            make defconfig
+            
+            echo "=== Step 5: Download ==="
+            make download -j$(nproc)
+            
+            echo "=== Step 6: Compile ==="
+            IGNORE_ERRORS=1 make -j$(nproc)
+            
+            # 3. Fix permissions so runner can access cache
+            echo "=== Fixing Permissions ==="
+            chown -R $CURRENT_UID:$CURRENT_GID /build || true
+            
+            DOCKER_SCRIPT

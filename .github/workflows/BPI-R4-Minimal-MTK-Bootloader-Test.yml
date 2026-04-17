@@ -59,6 +59,9 @@ jobs:
           cat > build_script.sh <<'SCRIPT'
             set -e
             export DEBIAN_FRONTEND=noninteractive
+            if [ "$(id -u)" = "0" ]; then
+              export FORCE_UNSAFE_CONFIGURE=1
+            fi
             
             # 1. Install dependencies
             apt-get -o Acquire::Languages=none update -qq

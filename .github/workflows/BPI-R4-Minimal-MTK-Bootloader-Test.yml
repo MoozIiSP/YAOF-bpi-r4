@@ -37,9 +37,9 @@ jobs:
             openwrt/build_dir
             # mtk-feed  # disabled for now; upstream URL currently 404
             bl-mt798x-dhcpd
-          key: ${{ runner.os }}-openwrt-minimal-${{ hashFiles('SCRIPTS/01_get_ready_minimal.sh') }}-${{ hashFiles('SEED/BPI-R4-MINIMAL/config.seed') }}
+          key: ${{ runner.os }}-openwrt-minimal-${{ hashFiles('SCRIPTS/01_get_ready_minimal.sh', 'SCRIPTS/02_prepare_package_minimal.sh', 'SCRIPTS/BPI-R4/02_target_only_minimal.sh', 'SEED/BPI-R4-MINIMAL/config.seed') }}
           restore-keys: |
-            ${{ runner.os }}-openwrt-minimal-${{ hashFiles('SCRIPTS/01_get_ready_minimal.sh') }}-
+            ${{ runner.os }}-openwrt-minimal-
 
       - name: Build with Podman
         env:

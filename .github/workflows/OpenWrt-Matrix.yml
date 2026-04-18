@@ -90,6 +90,7 @@ jobs:
       bundle_kind: dummy
       base_name: dummy
       gpt_layout: dummy
+      MTK_FEED_MODE: auto
 
     runs-on: ubuntu-24.04
     if: github.event.repository.owner.id == github.event.sender.id

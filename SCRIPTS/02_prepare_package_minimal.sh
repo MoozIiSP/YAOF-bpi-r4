@@ -58,11 +58,159 @@ replace_with_custom_package_wrapper() {
 disable_mtk_feed() {
   for feed_file in feeds.conf feeds.conf.default; do
     if [ -f "$feed_file" ]; then
-      sed_in_place '/^src-git\(-full\)\? mtk /d' "$feed_file"
+      sed_in_place '/^src-\(git\|link\)\(-full\)\? mtk /d' "$feed_file"
     fi
   done
 
   rm -rf ./feeds/mtk ./feeds/mtk.index
+}
+
+mtk_feed_source_dir="./.mtk-feed-source"
+mtk_feed_mode="${MTK_FEED_MODE:-disabled}"
+mtk_feed_branch="${MTK_FEED_BRANCH:-master}"
+mtk_feed_version_dir="${MTK_FEED_VERSION_DIR:-24.10}"
+mtk_feed_official_url="${MTK_FEED_OFFICIAL_URL:-https://git01.mediatek.com/openwrt/feeds/mtk-openwrt-feeds.git}"
+mtk_feed_mirror_url="${MTK_FEED_MIRROR_URL:-https://github.com/GainStrongService/mtk-openwrt-feeds.git}"
+mtk_feed_mapping_url="${MTK_FEED_MAPPING_URL:-https://raw.githubusercontent.com/GainStrongService/mtk-openwrt-feeds/master/mtk-openwrt-feeds-commit-sha-mapping-table.md}"
+
+configure_mtk_feed_link() {
+  local abs_source_dir
+  abs_source_dir="$(cd "$mtk_feed_source_dir" && pwd -P)"
+
+  for feed_file in feeds.conf feeds.conf.default; do
+    if [ -f "$feed_file" ]; then
+      sed_in_place '/^src-\(git\|link\)\(-full\)\? mtk /d' "$feed_file"
+      printf 'src-link mtk %s\n' "$abs_source_dir" >> "$feed_file"
+    fi
+  done
+}
+
+resolve_mtk_official_head() {
+  git ls-remote "$mtk_feed_official_url" "refs/heads/$mtk_feed_branch" | awk 'NR==1 {print $1}'
+}
+
+resolve_mtk_mirror_full_sha() {
+  local official_sha=$1
+  local official_short mirror_short
+
+  official_short="${official_sha:0:8}"
+  mirror_short="$(
+    curl -fsSL "$mtk_feed_mapping_url" | awk -F'|' -v sha="$official_short" '
+      function trim(s) {
+        gsub(/^[[:space:]]+|[[:space:]]+$/, "", s)
+        return s
+      }
+      trim($2) == sha {
+        print trim($3)
+        exit
+      }
+    '
+  )"
+
+  if [ -z "$mirror_short" ]; then
+    return 1
+  fi
+
+  curl -fsSL \
+    -H 'Accept: application/vnd.github+json' \
+    -H 'User-Agent: yaof-bpi-r4-ci' \
+    "https://api.github.com/repos/GainStrongService/mtk-openwrt-feeds/commits/$mirror_short" \
+    | jq -r '.sha // empty'
+}
+
+checkout_mtk_mirror_commit() {
+  local target_sha=$1
+
+  rm -rf "$mtk_feed_source_dir"
+  git init "$mtk_feed_source_dir" >/dev/null 2>&1
+  git -C "$mtk_feed_source_dir" remote add origin "$mtk_feed_mirror_url"
+  git -C "$mtk_feed_source_dir" fetch --depth 1 origin "$target_sha" >/dev/null 2>&1
+  git -C "$mtk_feed_source_dir" checkout --detach FETCH_HEAD >/dev/null 2>&1
+}
+
+prepare_mtk_feed_source() {
+  local official_head mirror_sha
+
+  case "$mtk_feed_mode" in
+    disabled)
+      echo "[MTK] Feed disabled"
+      disable_mtk_feed
+      return 0
+      ;;
+    official)
+      echo "[MTK] Using official feed: $mtk_feed_official_url@$mtk_feed_branch"
+      rm -rf "$mtk_feed_source_dir"
+      git clone --depth 1 -b "$mtk_feed_branch" "$mtk_feed_official_url" "$mtk_feed_source_dir"
+      ;;
+    auto|mirror)
+      if [ "$mtk_feed_mode" = "auto" ]; then
+        echo "[MTK] Trying official feed: $mtk_feed_official_url@$mtk_feed_branch"
+        rm -rf "$mtk_feed_source_dir"
+        if git clone --depth 1 -b "$mtk_feed_branch" "$mtk_feed_official_url" "$mtk_feed_source_dir"; then
+          echo "[MTK] Official feed clone succeeded"
+          configure_mtk_feed_link
+          return 0
+        fi
+        echo "[MTK] Official feed clone failed; falling back to mirror"
+      else
+        rm -rf "$mtk_feed_source_dir"
+      fi
+
+      official_head="$(resolve_mtk_official_head)"
+      if [ -z "$official_head" ]; then
+        echo "[MTK] Unable to resolve official head from $mtk_feed_official_url@$mtk_feed_branch" >&2
+        return 1
+      fi
+      echo "[MTK] Official head is $official_head"
+
+      if checkout_mtk_mirror_commit "$official_head"; then
+        echo "[MTK] Mirror contains matching commit $official_head"
+      else
+        mirror_sha="$(resolve_mtk_mirror_full_sha "$official_head")"
+        if [ -z "$mirror_sha" ]; then
+          echo "[MTK] Unable to map official commit $official_head to mirror commit" >&2
+          return 1
+        fi
+        checkout_mtk_mirror_commit "$mirror_sha"
+        echo "[MTK] Mirror fallback commit is $mirror_sha"
+      fi
+      ;;
+    *)
+      echo "[MTK] Unsupported MTK_FEED_MODE: $mtk_feed_mode" >&2
+      return 1
+      ;;
+  esac
+
+  configure_mtk_feed_link
+}
+
+apply_mtk_feed_overlay() {
+  local overlay_dir="./feeds/mtk/$mtk_feed_version_dir"
+  local patch_dir patch_file
+
+  if [ ! -d "$overlay_dir" ]; then
+    echo "[MTK] Overlay directory $overlay_dir not found" >&2
+    return 1
+  fi
+
+  if [ -d "$overlay_dir/files" ]; then
+    echo "[MTK] Applying files overlay from $overlay_dir/files"
+    cp -af "$overlay_dir/files/." .
+  fi
+
+  for patch_dir in patches-base patches-feeds; do
+    if [ ! -d "$overlay_dir/$patch_dir" ]; then
+      continue
+    fi
+
+    while IFS= read -r patch_file; do
+      [ -n "$patch_file" ] || continue
+      echo "[MTK] Applying patch $patch_file"
+      patch -f -p1 -i "$patch_file"
+    done <<EOF
+$(find "$overlay_dir/$patch_dir" -type f -name '*.patch' | sort)
+EOF
+  done
 }
 
 rewrite_feeds() {
@@ -86,13 +234,6 @@ rewrite_feeds "https://github.com/openwrt/packages.git;openwrt-24.10" \
               "https://github.com/openwrt/telephony.git;openwrt-24.10"
 disable_mtk_feed
 
-# MTK feed integration intentionally disabled for now because the upstream URL currently returns 404.
-# MTK_FEED_URL=${MTK_FEED_URL:-https://git01.mediatek.com/openwrt/feeds/mtk-openwrt-feeds.git}
-# MTK_FEED_BRANCH=${MTK_FEED_BRANCH:-master}
-# if ! grep -qE "^src-git mtk " feeds.conf.default; then
-#   echo "src-git mtk ${MTK_FEED_URL};${MTK_FEED_BRANCH}" >> feeds.conf.default
-# fi
-
 if ! ./scripts/feeds update -a; then
   echo "GitHub 镜像更新失败，尝试切换回官方源..."
   rewrite_feeds "https://git.openwrt.org/feed/packages.git;openwrt-24.10" \
@@ -103,8 +244,14 @@ if ! ./scripts/feeds update -a; then
   ./scripts/feeds update -a
 fi
 
+prepare_mtk_feed_source
+
+if [ "$mtk_feed_mode" != "disabled" ]; then
+  ./scripts/feeds update mtk
+  apply_mtk_feed_overlay
+fi
+
 ./scripts/feeds install -a
-# ./scripts/feeds install -a -p mtk -f || true
 
 restore_openwrt_boot_package arm-trusted-firmware-mediatek || true
 restore_openwrt_boot_package uboot-mediatek || true

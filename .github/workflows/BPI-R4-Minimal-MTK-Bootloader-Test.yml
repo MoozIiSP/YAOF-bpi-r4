@@ -23,15 +23,6 @@ jobs:
     env:
       seed: BPI-R4-MINIMAL
     steps:
-      - name: Clean workspace
-        run: |
-          mkdir -p "$GITHUB_WORKSPACE"
-          podman unshare bash -lc '
-            set -e
-            shopt -s dotglob nullglob
-            rm -rf -- "$1"/*
-          ' bash "$GITHUB_WORKSPACE"
-
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -44,7 +35,7 @@ jobs:
             openwrt/dl
             openwrt/staging_dir
             openwrt/build_dir
-            # .mtk-feed-source is commit-specific and prepared on demand
+            # mtk-feed  # disabled for now; upstream URL currently 404
             bl-mt798x-dhcpd
           key: ${{ runner.os }}-openwrt-minimal-${{ hashFiles('SCRIPTS/01_get_ready_minimal.sh', 'SCRIPTS/02_prepare_package_minimal.sh', 'SCRIPTS/BPI-R4/02_target_only_minimal.sh', 'SEED/BPI-R4-MINIMAL/config.seed') }}
           restore-keys: |
@@ -53,7 +44,6 @@ jobs:
       - name: Build with Podman
         env:
           INPUT_MEDIA: ${{ inputs.media || 'sd' }}
-          MTK_FEED_MODE: auto
         run: |
           CURRENT_UID=$(id -u)
           CURRENT_GID=$(id -g)
@@ -130,7 +120,6 @@ jobs:
             -w /build \
             -e CURRENT_UID=$CURRENT_UID \
             -e CURRENT_GID=$CURRENT_GID \
-            -e MTK_FEED_MODE=$MTK_FEED_MODE \
             -e BPI_R4_GPT_LAYOUT=$GPT_LAYOUT \
             ubuntu:24.04 \
             bash build_script.sh

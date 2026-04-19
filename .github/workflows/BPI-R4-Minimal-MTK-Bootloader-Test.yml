@@ -23,6 +23,11 @@ jobs:
     env:
       seed: BPI-R4-MINIMAL
     steps:
+      - name: Repair workspace permissions
+        run: |
+          sudo mkdir -p "$GITHUB_WORKSPACE"
+          sudo chown -R "$(id -u):$(id -g)" "$GITHUB_WORKSPACE"
+
       - name: Checkout
         uses: actions/checkout@v4
         with:

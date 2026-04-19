@@ -43,6 +43,7 @@ jobs:
 
       - name: Build with Podman
         id: compileopenwrt
+        continue-on-error: true
         env:
           INPUT_MEDIA: ${{ inputs.media || 'sd' }}
         run: |
@@ -126,7 +127,7 @@ jobs:
             bash build_script.sh
 
       - name: If Error
-        if: steps.compileopenwrt.outcome == 'failure'
+        if: ${{ always() && steps.compileopenwrt.outcome == 'failure' }}
         run: |
           podman run --rm \
             -v ${{ github.workspace }}:/build \
@@ -135,5 +136,14 @@ jobs:
             bash -lc '
               cat ./.config
               echo "================================================================"
-              make -j1 V=s
+              echo "=== Verbose ATF rebuild ==="
+              make package/boot/arm-trusted-firmware-mediatek/clean
+              make package/boot/arm-trusted-firmware-mediatek/compile -j1 V=s || true
+              echo "================================================================"
+              echo "=== Verbose world rebuild ==="
+              make -j1 V=s || true
             '
+
+      - name: Fail job if build failed
+        if: ${{ always() && steps.compileopenwrt.outcome == 'failure' }}
+        run: exit 1

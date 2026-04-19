@@ -55,6 +55,35 @@ replace_with_custom_package_wrapper() {
   echo "[BOOT] Replaced $label with custom OpenWrt package wrapper"
 }
 
+configure_package_use_source_dir() {
+  local pkg_dir=$1
+  local source_dir_rel=$2
+  local label=$3
+  local makefile="$pkg_dir/Makefile"
+  local temp_file
+
+  if [ ! -d "$source_dir_rel" ] || [ ! -f "$makefile" ]; then
+    return 1
+  fi
+
+  temp_file="$(mktemp)"
+  awk -v source_dir="$source_dir_rel" '
+    /^USE_SOURCE_DIR:=/ { next }
+    /^include \$\(INCLUDE_DIR\)\/package\.mk/ && !inserted {
+      print "USE_SOURCE_DIR:=$(TOPDIR)/" source_dir
+      inserted=1
+    }
+    { print }
+    END {
+      if (!inserted) {
+        print "USE_SOURCE_DIR:=$(TOPDIR)/" source_dir
+      }
+    }
+  ' "$makefile" > "$temp_file"
+  mv "$temp_file" "$makefile"
+  echo "[BOOT] Configured $label wrapper to use local source dir $source_dir_rel"
+}
+
 disable_mtk_feed() {
   for feed_file in feeds.conf feeds.conf.default; do
     if [ -f "$feed_file" ]; then
@@ -66,7 +95,7 @@ disable_mtk_feed() {
 }
 
 mtk_feed_source_dir="./.mtk-feed-source"
-mtk_feed_mode="${MTK_FEED_MODE:-disabled}"
+mtk_feed_mode="${MTK_FEED_MODE:-auto}"
 mtk_feed_branch="${MTK_FEED_BRANCH:-master}"
 mtk_feed_version_dir="${MTK_FEED_VERSION_DIR:-24.10}"
 mtk_feed_official_url="${MTK_FEED_OFFICIAL_URL:-https://git01.mediatek.com/openwrt/feeds/mtk-openwrt-feeds.git}"
@@ -258,26 +287,34 @@ restore_openwrt_boot_package uboot-mediatek || true
 
 if [ -d "../bl-mt798x-dhcpd" ]; then
   echo "[BOOT] Found custom bootloader repo: bl-mt798x-dhcpd"
-  atf_wrapper_replaced=0
+  atf_custom_applied=0
 
   if replace_with_custom_package_wrapper \
     "../bl-mt798x-dhcpd/atf-20260123" \
     "./package/boot/arm-trusted-firmware-mediatek" \
     "ATF"; then
-    atf_wrapper_replaced=1
+    atf_custom_applied=1
+  elif configure_package_use_source_dir \
+    "./package/boot/arm-trusted-firmware-mediatek" \
+    "../bl-mt798x-dhcpd/atf-20260123" \
+    "ATF"; then
+    atf_custom_applied=1
   fi
 
   replace_with_custom_package_wrapper \
     "../bl-mt798x-dhcpd/uboot-mtk-20250711" \
     "./package/boot/uboot-mediatek" \
+    "U-Boot" || configure_package_use_source_dir \
+    "./package/boot/uboot-mediatek" \
+    "../bl-mt798x-dhcpd/uboot-mtk-20250711" \
     "U-Boot" || true
 
-  if [ "$atf_wrapper_replaced" -eq 1 ] && [ -n "${BPI_R4_GPT_LAYOUT:-}" ] && [ -f "../PATCH/gpt/$BPI_R4_GPT_LAYOUT" ]; then
-    mkdir -p ./package/boot/arm-trusted-firmware-mediatek/src/gpt
-    cp "../PATCH/gpt/$BPI_R4_GPT_LAYOUT" ./package/boot/arm-trusted-firmware-mediatek/src/gpt/
+  if [ "$atf_custom_applied" -eq 1 ] && [ -n "${BPI_R4_GPT_LAYOUT:-}" ] && [ -f "../PATCH/gpt/$BPI_R4_GPT_LAYOUT" ]; then
+    mkdir -p ../bl-mt798x-dhcpd/atf-20260123/src/gpt
+    cp "../PATCH/gpt/$BPI_R4_GPT_LAYOUT" ../bl-mt798x-dhcpd/atf-20260123/src/gpt/
     echo "[GPT] Injected GPT layout: $BPI_R4_GPT_LAYOUT"
-  elif [ -n "${BPI_R4_GPT_LAYOUT:-}" ] && [ "$atf_wrapper_replaced" -ne 1 ]; then
-    echo "[GPT] Skipping GPT layout injection because no custom ATF package wrapper was applied"
+  elif [ -n "${BPI_R4_GPT_LAYOUT:-}" ] && [ "$atf_custom_applied" -ne 1 ]; then
+    echo "[GPT] Skipping GPT layout injection because no custom ATF source was applied"
   elif [ -n "${BPI_R4_GPT_LAYOUT:-}" ]; then
     echo "[GPT] Requested GPT layout '$BPI_R4_GPT_LAYOUT' not found, skipping"
   else

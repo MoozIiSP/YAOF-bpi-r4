@@ -23,10 +23,14 @@ jobs:
     env:
       seed: BPI-R4-MINIMAL
     steps:
-      - name: Repair workspace permissions
+      - name: Clean workspace
         run: |
           mkdir -p "$GITHUB_WORKSPACE"
-          podman unshare chown -R "$(id -u):$(id -g)" "$GITHUB_WORKSPACE"
+          podman unshare bash -lc '
+            set -e
+            shopt -s dotglob nullglob
+            rm -rf -- "$1"/*
+          ' bash "$GITHUB_WORKSPACE"
 
       - name: Checkout
         uses: actions/checkout@v4

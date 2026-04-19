@@ -84,6 +84,16 @@ configure_package_use_source_dir() {
   echo "[BOOT] Configured $label wrapper to use local source dir $source_dir_rel"
 }
 
+ensure_file_has_line() {
+  local file_path=$1
+  local line=$2
+  local label=$3
+
+  [ -f "$file_path" ] || return 1
+  grep -Fqx "$line" "$file_path" || printf '%s\n' "$line" >> "$file_path"
+  echo "$label Ensured $(basename "$file_path") contains: $line"
+}
+
 ### feeds 优化 ###
 # 先尝试 GitHub 镜像，失败后回退到 git.openwrt.org
 rewrite_feeds() {
@@ -288,6 +298,11 @@ if [ "$mtk_feed_mode" != "disabled" ]; then
   ./scripts/feeds update mtk
   apply_mtk_feed_overlay
 fi
+
+ensure_file_has_line \
+  "./target/linux/mediatek/filogic/config-6.6" \
+  "# CONFIG_USB_XHCI_MTK_DEBUGFS is not set" \
+  "[KERNEL]"
 
 if ! ./scripts/feeds install -a; then
   echo "Feeds 安装部分失败，请检查上游仓库状态。" >&2

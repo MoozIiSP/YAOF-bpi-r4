@@ -116,7 +116,7 @@ mtk_feed_mode="${MTK_FEED_MODE:-auto}"
 mtk_feed_branch="${MTK_FEED_BRANCH:-master}"
 mtk_feed_version_dir="${MTK_FEED_VERSION_DIR:-24.10}"
 mtk_feed_official_url="${MTK_FEED_OFFICIAL_URL:-https://git01.mediatek.com/openwrt/feeds/mtk-openwrt-feeds.git}"
-mtk_feed_mirror_url="${MTK_FEED_MIRROR_URL:-https://github.com/GainStrongService/mtk-openwrt-feeds.git}"
+mtk_feed_mirror_url="${MTK_FEED_MIRROR_URL:-https://tea.saymi-labs.top/Learning/mtk-openwrt-feeds}"
 mtk_feed_mapping_url="${MTK_FEED_MAPPING_URL:-https://raw.githubusercontent.com/GainStrongService/mtk-openwrt-feeds/master/mtk-openwrt-feeds-commit-sha-mapping-table.md}"
 
 configure_mtk_feed_link() {

@@ -42,6 +42,7 @@ jobs:
             ${{ runner.os }}-openwrt-minimal-
 
       - name: Build with Podman
+        id: compileopenwrt
         env:
           INPUT_MEDIA: ${{ inputs.media || 'sd' }}
         run: |
@@ -106,16 +107,7 @@ jobs:
             make -j1 V=sc tools/tar/compile
 
             echo "=== Step 7: Compile ==="
-            set +e
             IGNORE_ERRORS=1 make -j$(nproc)
-            build_status=$?
-            set -e
-
-            if [ "$build_status" -ne 0 ]; then
-              echo "=== Step 7b: Verbose target/linux retry ==="
-              make -j1 V=sc target/linux/compile
-              exit "$build_status"
-            fi
             
             # 3. Fix permissions
             echo "=== Fixing Permissions ==="
@@ -132,3 +124,16 @@ jobs:
             -e BPI_R4_GPT_LAYOUT=$GPT_LAYOUT \
             ubuntu:24.04 \
             bash build_script.sh
+
+      - name: If Error
+        if: steps.compileopenwrt.outcome == 'failure'
+        run: |
+          podman run --rm \
+            -v ${{ github.workspace }}:/build \
+            -w /build/openwrt \
+            ubuntu:24.04 \
+            bash -lc '
+              cat ./.config
+              echo "================================================================"
+              make -j1 V=s
+            '

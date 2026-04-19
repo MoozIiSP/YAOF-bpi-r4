@@ -101,6 +101,7 @@ mtk_feed_version_dir="${MTK_FEED_VERSION_DIR:-24.10}"
 mtk_feed_official_url="${MTK_FEED_OFFICIAL_URL:-https://git01.mediatek.com/openwrt/feeds/mtk-openwrt-feeds.git}"
 mtk_feed_mirror_url="${MTK_FEED_MIRROR_URL:-https://tea.saymi-labs.top/Learning/mtk-openwrt-feeds}"
 mtk_feed_mapping_url="${MTK_FEED_MAPPING_URL:-https://raw.githubusercontent.com/GainStrongService/mtk-openwrt-feeds/master/mtk-openwrt-feeds-commit-sha-mapping-table.md}"
+mtk_feed_skip_patches="${MTK_FEED_SKIP_PATCHES:-1000-arch-arm64-dts-add-fitblk-support-for-MediaTek-RFB.patch}"
 
 configure_mtk_feed_link() {
   local abs_source_dir
@@ -215,7 +216,7 @@ prepare_mtk_feed_source() {
 
 apply_mtk_feed_overlay() {
   local overlay_dir="./feeds/mtk/$mtk_feed_version_dir"
-  local patch_dir patch_file
+  local patch_dir patch_file patch_name
 
   if [ ! -d "$overlay_dir" ]; then
     echo "[MTK] Overlay directory $overlay_dir not found" >&2
@@ -234,6 +235,11 @@ apply_mtk_feed_overlay() {
 
     while IFS= read -r patch_file; do
       [ -n "$patch_file" ] || continue
+      patch_name="${patch_file##*/}"
+      if printf '%s\n' "$mtk_feed_skip_patches" | tr ', ' '\n\n' | grep -Fxq "$patch_name"; then
+        echo "[MTK] Skipping patch $patch_file"
+        continue
+      fi
       echo "[MTK] Applying patch $patch_file"
       patch -f -p1 -i "$patch_file"
     done <<EOF

@@ -106,7 +106,16 @@ jobs:
             make -j1 V=sc tools/tar/compile
 
             echo "=== Step 7: Compile ==="
+            set +e
             IGNORE_ERRORS=1 make -j$(nproc)
+            build_status=$?
+            set -e
+
+            if [ "$build_status" -ne 0 ]; then
+              echo "=== Step 7b: Verbose target/linux retry ==="
+              make -j1 V=sc target/linux/compile
+              exit "$build_status"
+            fi
             
             # 3. Fix permissions
             echo "=== Fixing Permissions ==="

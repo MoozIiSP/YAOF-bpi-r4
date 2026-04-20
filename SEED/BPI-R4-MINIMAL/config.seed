@@ -16,6 +16,11 @@ CONFIG_PACKAGE_mt7988-wo-firmware=y
 CONFIG_PACKAGE_atenl=y
 
 ### BOOTLOADER / IMAGE VALIDATION ###
+# Keep minimal validation focused on BPI-R4 / MT7988 only.
+# CONFIG_PACKAGE_trusted-firmware-a-mt7981-ram-ddr3 is not set
+# CONFIG_PACKAGE_trusted-firmware-a-mt7981-ram-ddr4 is not set
+# CONFIG_PACKAGE_trusted-firmware-a-mt7986-ram-ddr3 is not set
+# CONFIG_PACKAGE_trusted-firmware-a-mt7986-ram-ddr4 is not set
 CONFIG_PACKAGE_trusted-firmware-a-mt7988-emmc-comb=y
 CONFIG_PACKAGE_trusted-firmware-a-mt7988-ram-comb=y
 CONFIG_PACKAGE_trusted-firmware-a-mt7988-sdmmc-comb=y

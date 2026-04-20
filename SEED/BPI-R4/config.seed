@@ -314,3 +314,8 @@ CONFIG_LINUX_6_6=y
 
 ### U-Boot & A/B Support
 CONFIG_PACKAGE_uboot-envtools=y
+# Keep BPI-R4 builds on the MT7988 bootloader variants we actually use.
+# CONFIG_PACKAGE_trusted-firmware-a-mt7981-ram-ddr3 is not set
+# CONFIG_PACKAGE_trusted-firmware-a-mt7981-ram-ddr4 is not set
+# CONFIG_PACKAGE_trusted-firmware-a-mt7986-ram-ddr3 is not set
+# CONFIG_PACKAGE_trusted-firmware-a-mt7986-ram-ddr4 is not set

@@ -84,6 +84,15 @@ configure_package_use_source_dir() {
   echo "[BOOT] Configured $label wrapper to use local source dir $source_dir_rel"
 }
 
+patch_custom_atf_sdmmc_flags() {
+  local bl2_mk=$1
+
+  [ -f "$bl2_mk" ] || return 1
+
+  perl -0pi -e 's/ifeq \(\$\(BOOT_DEVICE\),sdmmc\)\n\$\(eval \$\(call BL2_BOOT_SD\)\)\nBL2_SOURCES\t\t\+=\t\+\$\(MTK_PLAT_SOC\)\/bl2\/bl2_dev_mmc\.c\nDEFINES\t\t\t\+=\t-DMSDC_INDEX=1\nDTS_NAME\t\t:=\tmt7988\nendif # END OF BOOTDEVICE = sdmmc/ifeq (\$(BOOT_DEVICE),sdmmc)\n\$(eval \$(call BL2_BOOT_SD))\nBL2_SOURCES\t\t+=\t\$(MTK_PLAT_SOC)\/bl2\/bl2_dev_mmc.c\nBL2_CPPFLAGS\t\t+=\t-DMSDC_INDEX=1\nDTS_NAME\t\t:=\tmt7988\nendif # END OF BOOTDEVICE = sdmmc/s' "$bl2_mk"
+  echo "[BOOT] Patched custom ATF sdmmc flags in $(basename "$bl2_mk")"
+}
+
 ensure_file_has_line() {
   local file_path=$1
   local line=$2
@@ -349,6 +358,10 @@ if [ -d "../bl-mt798x-dhcpd" ]; then
     echo "[GPT] Requested GPT layout '$BPI_R4_GPT_LAYOUT' not found, skipping"
   else
     echo "[GPT] No block-device GPT layout requested (expected for NAND / non-GPT targets)"
+  fi
+
+  if [ "$atf_custom_applied" -eq 1 ]; then
+    patch_custom_atf_sdmmc_flags "../bl-mt798x-dhcpd/atf-20260123/plat/mediatek/mt7988/bl2/bl2.mk" || true
   fi
 
   else

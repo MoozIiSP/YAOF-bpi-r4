@@ -142,7 +142,27 @@ jobs:
             make -j1 V=sc tools/tar/compile
 
             echo "=== Step 7: Compile ==="
+            set +e
             IGNORE_ERRORS=1 make -j$(nproc)
+            build_status=$?
+            set -e
+
+            if [ "$build_status" -ne 0 ]; then
+              echo "================================================================"
+              echo "=== Debug: Final .config ==="
+              grep -E '^(# )?CONFIG_PACKAGE_(trusted-firmware-a-mt7988|u-boot-mt7988_bananapi_bpi-r4)' .config || true
+              echo "================================================================"
+              echo "=== Debug: Custom ATF mt7988 bl2.mk ==="
+              sed -n '104,128p' ../bl-mt798x-dhcpd/atf-20260123/plat/mediatek/mt7988/bl2/bl2.mk || true
+              echo "================================================================"
+              echo "=== Verbose ATF rebuild ==="
+              make package/boot/arm-trusted-firmware-mediatek/clean
+              make package/boot/arm-trusted-firmware-mediatek/compile -j1 V=s || true
+              echo "================================================================"
+              echo "=== Verbose world rebuild ==="
+              make -j1 V=s || true
+              exit "$build_status"
+            fi
             
             # 3. Fix permissions
             echo "=== Fixing Permissions ==="
@@ -159,24 +179,6 @@ jobs:
             -e BPI_R4_GPT_LAYOUT=$GPT_LAYOUT \
             ubuntu:24.04 \
             bash build_script.sh
-
-      - name: If Error
-        if: ${{ always() && steps.compileopenwrt.outcome == 'failure' }}
-        run: |
-          podman run --rm \
-            -v ${{ github.workspace }}:/build \
-            -w /build/openwrt \
-            ubuntu:24.04 \
-            bash -lc '
-              cat ./.config
-              echo "================================================================"
-              echo "=== Verbose ATF rebuild ==="
-              make package/boot/arm-trusted-firmware-mediatek/clean
-              make package/boot/arm-trusted-firmware-mediatek/compile -j1 V=s || true
-              echo "================================================================"
-              echo "=== Verbose world rebuild ==="
-              make -j1 V=s || true
-            '
 
       - name: Fail job if build failed
         if: ${{ always() && steps.compileopenwrt.outcome == 'failure' }}

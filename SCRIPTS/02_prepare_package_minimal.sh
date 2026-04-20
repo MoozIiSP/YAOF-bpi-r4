@@ -103,6 +103,15 @@ ensure_file_has_line() {
   echo "$label Ensured $(basename "$file_path") contains: $line"
 }
 
+fix_tfa_ldflags_compat() {
+  local tfa_include=./include/trusted-firmware-a.mk
+
+  [ -f "$tfa_include" ] || return 1
+
+  perl -0pi -e 's/LDFLAGS="-no-warn-rwx-segments"/LDFLAGS="-Wl,--no-warn-rwx-segments"/g' "$tfa_include"
+  echo "[BOOT] Patched trusted-firmware-a LDFLAGS compatibility in $(basename "$tfa_include")"
+}
+
 disable_mtk_feed() {
   for feed_file in feeds.conf feeds.conf.default; do
     if [ -f "$feed_file" ]; then
@@ -309,6 +318,8 @@ ensure_file_has_line \
   "./target/linux/mediatek/filogic/config-6.6" \
   "# CONFIG_USB_XHCI_MTK_DEBUGFS is not set" \
   "[KERNEL]"
+
+fix_tfa_ldflags_compat
 
 ./scripts/feeds install -a
 

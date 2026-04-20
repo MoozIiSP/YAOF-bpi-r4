@@ -103,6 +103,15 @@ ensure_file_has_line() {
   echo "$label Ensured $(basename "$file_path") contains: $line"
 }
 
+fix_tfa_ldflags_compat() {
+  local tfa_include=./include/trusted-firmware-a.mk
+
+  [ -f "$tfa_include" ] || return 1
+
+  perl -0pi -e 's/LDFLAGS="-no-warn-rwx-segments"/LDFLAGS="-Wl,--no-warn-rwx-segments"/g' "$tfa_include"
+  echo "[BOOT] Patched trusted-firmware-a LDFLAGS compatibility in $(basename "$tfa_include")"
+}
+
 ### feeds 优化 ###
 # 先尝试 GitHub 镜像，失败后回退到 git.openwrt.org
 rewrite_feeds() {
@@ -312,6 +321,8 @@ ensure_file_has_line \
   "./target/linux/mediatek/filogic/config-6.6" \
   "# CONFIG_USB_XHCI_MTK_DEBUGFS is not set" \
   "[KERNEL]"
+
+fix_tfa_ldflags_compat
 
 if ! ./scripts/feeds install -a; then
   echo "Feeds 安装部分失败，请检查上游仓库状态。" >&2

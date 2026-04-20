@@ -1,0 +1,22 @@
+# OpenWrt source trees (fetched during build)
+openwrt/
+openwrt_snap/
+
+# Bootloader submodule (fetched during build)
+bl-mt798x-dhcpd/
+
+# Build artifacts
+dl/
+build_dir/
+staging_dir/
+tmp/
+logs/
+*.bin
+*.img
+*.tar.gz
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo

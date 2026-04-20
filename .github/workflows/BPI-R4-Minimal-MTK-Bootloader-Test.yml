@@ -127,7 +127,8 @@ jobs:
                 ;;
             esac
 
-            make defconfig
+            echo "=== Step 4c: Final bootloader config ==="
+            grep -E '^(# )?CONFIG_PACKAGE_(trusted-firmware-a-mt7988|u-boot-mt7988_bananapi_bpi-r4)' .config || true
             
             echo "=== Step 5: Download ==="
             make download -j$(nproc)

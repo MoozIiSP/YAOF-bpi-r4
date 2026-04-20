@@ -92,6 +92,30 @@ jobs:
             
             echo "=== Step 3: Config ==="
             cp -rf ../SEED/BPI-R4-MINIMAL/config.seed .config
+
+            echo "=== Step 3b: Narrow bootloader variants for $INPUT_MEDIA ==="
+            case "$INPUT_MEDIA" in
+              emmc)
+                cat >> .config <<'EOF'
+# CONFIG_PACKAGE_trusted-firmware-a-mt7988-sdmmc-comb is not set
+# CONFIG_PACKAGE_trusted-firmware-a-mt7988-spim-nand-ubi-comb is not set
+# CONFIG_PACKAGE_u-boot-mt7988_bananapi_bpi-r4-sdmmc is not set
+# CONFIG_PACKAGE_u-boot-mt7988_bananapi_bpi-r4-snand is not set
+CONFIG_PACKAGE_trusted-firmware-a-mt7988-emmc-comb=y
+CONFIG_PACKAGE_u-boot-mt7988_bananapi_bpi-r4-emmc=y
+EOF
+                ;;
+              sd|*)
+                cat >> .config <<'EOF'
+# CONFIG_PACKAGE_trusted-firmware-a-mt7988-emmc-comb is not set
+# CONFIG_PACKAGE_trusted-firmware-a-mt7988-spim-nand-ubi-comb is not set
+# CONFIG_PACKAGE_u-boot-mt7988_bananapi_bpi-r4-emmc is not set
+# CONFIG_PACKAGE_u-boot-mt7988_bananapi_bpi-r4-snand is not set
+CONFIG_PACKAGE_trusted-firmware-a-mt7988-sdmmc-comb=y
+CONFIG_PACKAGE_u-boot-mt7988_bananapi_bpi-r4-sdmmc=y
+EOF
+                ;;
+            esac
             
             echo "=== Step 4: Defconfig ==="
             make defconfig

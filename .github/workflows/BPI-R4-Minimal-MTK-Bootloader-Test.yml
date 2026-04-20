@@ -93,7 +93,19 @@ jobs:
             echo "=== Step 3: Config ==="
             cp -rf ../SEED/BPI-R4-MINIMAL/config.seed .config
 
-            echo "=== Step 3b: Narrow bootloader variants for $INPUT_MEDIA ==="
+            echo "=== Step 4: Defconfig ==="
+            make defconfig
+
+            echo "=== Step 4b: Narrow bootloader variants for $INPUT_MEDIA ==="
+            sed -i \
+              -e '/^CONFIG_PACKAGE_trusted-firmware-a-mt7988-emmc-comb=/d' \
+              -e '/^CONFIG_PACKAGE_trusted-firmware-a-mt7988-sdmmc-comb=/d' \
+              -e '/^CONFIG_PACKAGE_trusted-firmware-a-mt7988-spim-nand-ubi-comb=/d' \
+              -e '/^CONFIG_PACKAGE_u-boot-mt7988_bananapi_bpi-r4-emmc=/d' \
+              -e '/^CONFIG_PACKAGE_u-boot-mt7988_bananapi_bpi-r4-sdmmc=/d' \
+              -e '/^CONFIG_PACKAGE_u-boot-mt7988_bananapi_bpi-r4-snand=/d' \
+              .config
+
             case "$INPUT_MEDIA" in
               emmc)
                 printf '%s\n' \
@@ -114,8 +126,7 @@ jobs:
                   'CONFIG_PACKAGE_u-boot-mt7988_bananapi_bpi-r4-sdmmc=y' >> .config
                 ;;
             esac
-            
-            echo "=== Step 4: Defconfig ==="
+
             make defconfig
             
             echo "=== Step 5: Download ==="

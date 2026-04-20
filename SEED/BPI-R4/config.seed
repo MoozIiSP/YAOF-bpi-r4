@@ -319,3 +319,5 @@ CONFIG_PACKAGE_uboot-envtools=y
 # CONFIG_PACKAGE_trusted-firmware-a-mt7981-ram-ddr4 is not set
 # CONFIG_PACKAGE_trusted-firmware-a-mt7986-ram-ddr3 is not set
 # CONFIG_PACKAGE_trusted-firmware-a-mt7986-ram-ddr4 is not set
+# CONFIG_PACKAGE_trusted-firmware-a-mt7988-ram-comb is not set
+# CONFIG_PACKAGE_trusted-firmware-a-mt7988-spim-nand-ubi-comb is not set
